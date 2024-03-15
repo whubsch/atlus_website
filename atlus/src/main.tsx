@@ -8,7 +8,10 @@ import Navbar from "./components/Navbar.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <NextUIProvider>
-      <main className="dark text-foreground bg-background">
+      <main
+        className="dark text-foreground bg-background"
+        style={{ minHeight: "100vh" }}
+      >
         <Navbar />
         <App />
       </main>

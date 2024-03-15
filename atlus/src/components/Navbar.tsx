@@ -8,7 +8,7 @@ import {
 } from "@nextui-org/react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
-export default function App() {
+export default function AtlusNav() {
   return (
     <Navbar>
       <NavbarBrand>

@@ -1,31 +1,59 @@
 import { useState } from "react";
 import "./App.css";
-import { Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
+// import Intro from "./components/Intro";
+import {
+  Button,
+  Input,
+  Card,
+  CardBody,
+  Spinner,
+  Listbox,
+  ListboxItem,
+} from "@nextui-org/react";
+
 import CopyAllIcon from "@mui/icons-material/CopyAll";
 import SwitchAccessShortcutIcon from "@mui/icons-material/SwitchAccessShortcut";
 import CheckIcon from "@mui/icons-material/Check";
 
+const strings = [
+  "123 Main St, Springfield, IL 62701",
+  "1500 Pennsylvania Ave NW, Washington, DC 20220, United States",
+  "456 Elm Ave, Anytown, NY 12345",
+  "789 Oak Dr, Smallville California, 98765",
+  "101 W. Pine St Bigtown Texas 54321",
+  "234 Cedar Hwy Suite 2, W. Des Moines, IA",
+  "345 MAPLE RD, COUNTRYSIDE, PA 24680-0198",
+  "678 MLK Blvd, Suburbia, Ohio 97531",
+  "890 St Mary St, Metropolis, GA 86420",
+  "111 N.E. Cherry St, Villageton, Michigan 36912",
+  "222 NW Pineapple Ave, Beachville, SC 75309",
+  "333 Orange Blvd, Riverside Arizona 80203",
+  "444 Grape St SE, Hilltop, NV 46895 Unit B",
+  "158 S. Thomas Court, Marietta, GA 30008",
+  "666 BANANA AVE LAKESIDE NEW MEXICO 36921",
+  "777 Strawberry Street, Mountainview, OR 25874",
+];
+
 function App() {
   const [inputValue, setInputValue] = useState<string>("");
   const [response, setResponse] = useState<string>("");
-  const [copyButton, setCopyButton] = useState<string>("Copy");
+  const [copied, setCopied] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const clearAll = () => {
     setInputValue("");
     setResponse("");
-    setCopyButton("Copy");
+    setCopied(false);
   };
 
   const handleRandom = () => {
-    setInputValue(
-      "1500 Pennsylvania Ave NW, Washington, DC 20220, United States"
-    );
+    const randomIndex = Math.floor(Math.random() * strings.length);
+    setInputValue(strings[randomIndex]);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSubmit = async () => {
     try {
+      setLoading(true);
       const apiUrl = "http://localhost/api/parse/"; // Replace with your API endpoint
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -43,6 +71,8 @@ function App() {
       setResponse(tags);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,8 +80,16 @@ function App() {
     setInputValue(event.target.value);
   };
 
+  const handleClick = () => {
+    if (inputValue.trim() === "") {
+      handleRandom();
+    } else {
+      handleSubmit();
+    }
+  };
+
   const clipboardCopy = () => {
-    setCopyButton("Copied");
+    setCopied(true);
     const text = Object.entries(response).map(
       ([key, value]) => `${key}=${value}`
     );
@@ -59,17 +97,18 @@ function App() {
   };
 
   return (
-    <>
-      <div className="flex flex-col justify-center items-center py-20 px-4">
-        <img src="/logo_white.png" alt="Atlus logo" className="mb-4 w-1/6" />
-        <h1 className="text-3xl font-bold mb-4">Atlus</h1>
+    <div className="flex flex-col justify-center items-center py-20 px-4">
+      <img
+        src="/logo_white.png"
+        alt="Atlus logo"
+        className="mb-4 w-2/3 md:w-1/4"
+      />
+      <h1 className="text-3xl font-bold mb-4">Atlus</h1>
 
-        <Card className="p-6 rounded-lg w-1/3 min-w-full md:min-w-80">
+      <div className="relative w-1/2 min-w-full md:min-w-80">
+        <Card className="p-6 z-10 rounded-lg overflow-hidden">
           <CardBody>
-            <form
-              className="flex flex-wrap md:flex-nowrap gap-2"
-              onSubmit={!inputValue ? handleRandom : handleSubmit}
-            >
+            <div className="flex flex-wrap md:flex-nowrap gap-2">
               <Input
                 type="text"
                 size="md"
@@ -80,22 +119,22 @@ function App() {
               <Button
                 color="primary"
                 size="md"
-                type="submit"
-                className="h-14 w-full md:w-auto"
+                className="h-10 md:h-14 w-full md:w-auto"
+                onClick={handleClick}
               >
                 {!inputValue ? (
                   <SwitchAccessShortcutIcon />
                 ) : (
-                  <>{!response ? "Submit" : <Spinner color="default" />}</>
+                  <>{!loading ? "Submit" : <Spinner color="default" />}</>
                 )}
               </Button>
-            </form>
+            </div>
           </CardBody>
         </Card>
         <Card
-          className={`p-6 rounded-lg w-1/3 min-w-full md:min-w-80${
-            !response ? " hidden" : ""
-          }`}
+          className={`p-6 z-0 rounded-lg inset-x-0 top-0 absolute ${
+            !response ? "translate-y-0" : "translate-y-48 md:translate-y-36"
+          } transition-transform duration-300 ease-in-out`}
         >
           <div className="flex justify-between gap-2 p-2">
             <Button
@@ -110,29 +149,33 @@ function App() {
               color="primary"
               size="sm"
               onClick={clipboardCopy}
-              endContent={
-                copyButton === "Copied" ? <CheckIcon /> : <CopyAllIcon />
-              }
+              endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
               className="w-1/2"
             >
-              {copyButton}
+              {copied ? "Copied" : "Copy"}
             </Button>
           </div>
-
-          {Object.entries(response).map(([key, value], index) => (
-            <Input
-              isReadOnly
-              type="text"
-              size="sm"
-              label={key}
-              value={value}
-              className="p-1"
-              key={String(index)}
-            />
-          ))}
+          <div className="flex flex-wrap">
+            <Listbox
+              variant="flat"
+              aria-label="List displaying parsed address"
+              emptyContent={null}
+            >
+              {Object.entries(response).map(([key, value], index) => (
+                <ListboxItem
+                  key={String(index)}
+                  description={key}
+                  className="cursor-default"
+                >
+                  {value}
+                </ListboxItem>
+              ))}
+            </Listbox>
+          </div>
         </Card>
       </div>
-    </>
+      {/* <Intro /> */}
+    </div>
   );
 }
 

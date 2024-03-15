@@ -43,9 +43,11 @@ def lower_match(match: regex.Match) -> str:
     return match.group(1).lower()
 
 
-def get_title(value: str) -> str:
+def get_title(value: str, single_word: bool = False) -> str:
     """Fix ALL-CAPS string."""
-    return mc_replace(value.title()) if (value.isupper() and " " in value) else value
+    if (value.isupper() and " " in value) or (value.isupper() and single_word):
+        return mc_replace(value.title())
+    return value
 
 
 def us_replace(value: str) -> str:
@@ -154,7 +156,7 @@ def process(address_string) -> OrderedDict[str, str | int]:
         )
 
     if "addr:city" in cleaned:
-        cleaned["addr:city"] = abbrs(cleaned["addr:city"])
+        cleaned["addr:city"] = abbrs(get_title(cleaned["addr:city"], single_word=True))
 
     if "addr:state" in cleaned:
         if cleaned["addr:state"].upper() in state_expand:
