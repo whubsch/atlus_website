@@ -4,17 +4,10 @@ from pydantic import BaseModel, Field
 
 from .process import process
 
-app = FastAPI()
-
-from fastapi.middleware.cors import CORSMiddleware
-
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",
-    "localhost:5173"
-]
+origins = ["http://localhost:5173", "localhost:5173"]
 
 
 app.add_middleware(
@@ -22,8 +15,9 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
+
 
 class ApiMeta(BaseModel):
     """Define basic API features."""
@@ -121,7 +115,7 @@ async def single(address: AddressInput) -> AddressReturn:
 
 @app.post("/api/batch/", response_model_exclude_none=True)
 async def batch(addresses: list[AddressListInput]) -> AddressListReturn:
-    """Return a batch of parsed address."""
+    """Return a batch of parsed addresses."""
     cleaned = []
     for address in addresses:
         cleaned.append(dict(process(address.address)) | {"@id": address.id})

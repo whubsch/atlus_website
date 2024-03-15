@@ -6,6 +6,7 @@ import {
   Link,
   Button,
 } from "@nextui-org/react";
+import GitHubIcon from "@mui/icons-material/GitHub";
 
 export default function App() {
   return (
@@ -15,7 +16,9 @@ export default function App() {
       </NavbarBrand>
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link href="#">Github</Link>
+          <Link href="https://github.com/whubsch/atlus">
+            <GitHubIcon />
+          </Link>
         </NavbarItem>
         <NavbarItem>
           <Button
