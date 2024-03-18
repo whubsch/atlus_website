@@ -54,7 +54,7 @@ function App() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const apiUrl = "http://localhost/api/parse/"; // Replace with your API endpoint
+      const apiUrl = "/api/parse/"; // Replace with your API endpoint
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -134,7 +134,7 @@ function App() {
         <Card
           className={`p-6 z-0 rounded-lg inset-x-0 top-0 absolute ${
             !response ? "translate-y-0" : "translate-y-48 md:translate-y-36"
-          } transition-transform duration-300 ease-in-out`}
+          }`}
         >
           <div className="flex justify-between gap-2 p-2">
             <Button
