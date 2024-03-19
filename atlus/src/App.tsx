@@ -9,6 +9,8 @@ import {
   Spinner,
   Listbox,
   ListboxItem,
+  Tabs,
+  Tab,
 } from "@nextui-org/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
@@ -39,7 +41,9 @@ function App() {
   const [response, setResponse] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedTab, setSelectedTab] = useState<string>("address");
 
+  const tabs = ["address", "phone"];
   const clearAll = () => {
     setInputValue("");
     setResponse("");
@@ -54,14 +58,14 @@ function App() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const apiUrl = "/api/parse/"; // Replace with your API endpoint
+      const apiUrl = `http://localhost:5000/${selectedTab}/parse/`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           accept: "application/json",
         },
-        body: JSON.stringify({ address: inputValue }),
+        body: JSON.stringify({ [selectedTab]: inputValue }),
         mode: "cors",
       });
 
@@ -105,14 +109,50 @@ function App() {
       />
       <h1 className="text-3xl font-bold mb-4">Atlus</h1>
 
-      <div className="relative w-1/2 min-w-full md:min-w-80">
+      <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3">
         <Card className="p-6 z-10 rounded-lg overflow-hidden">
           <CardBody>
-            <div className="flex flex-wrap md:flex-nowrap gap-2">
+            <Tabs
+              selectedKey={selectedTab}
+              onSelectionChange={setSelectedTab}
+              className="place-content-center p-2"
+            >
+              {tabs.map((tab) => (
+                <Tab
+                  key={tab}
+                  title={tab}
+                  className="text-transform capitalize"
+                ></Tab>
+              ))}
+            </Tabs>
+            <div className="flex flex-wrap max-sm:hidden md:flex-nowrap gap-2">
               <Input
                 type="text"
                 size="md"
-                label="Address"
+                label="Input"
+                value={inputValue}
+                onChange={handleInputChange}
+                endContent={
+                  <Button
+                    color="primary"
+                    size="md"
+                    className="h-full w-4 md:w-auto"
+                    onClick={handleClick}
+                  >
+                    {!inputValue ? (
+                      <SwitchAccessShortcutIcon />
+                    ) : (
+                      <>{!loading ? "Submit" : <Spinner color="default" />}</>
+                    )}
+                  </Button>
+                }
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 md:hidden">
+              <Input
+                type="text"
+                size="md"
+                label="Input"
                 value={inputValue}
                 onChange={handleInputChange}
               />
@@ -133,7 +173,7 @@ function App() {
         </Card>
         <Card
           className={`p-6 z-0 rounded-lg inset-x-0 top-0 absolute ${
-            !response ? "translate-y-0" : "translate-y-48 md:translate-y-36"
+            !response ? "translate-y-0" : "translate-y-60 md:translate-y-48"
           }`}
         >
           <div className="flex justify-between gap-2 p-2">
@@ -161,15 +201,18 @@ function App() {
               aria-label="List displaying parsed address"
               emptyContent={null}
             >
-              {Object.entries(response).map(([key, value], index) => (
-                <ListboxItem
-                  key={String(index)}
-                  description={key}
-                  className="cursor-default"
-                >
-                  {value}
-                </ListboxItem>
-              ))}
+              {Object.entries(response)
+                .filter(([key, _]) => key !== "@removed")
+                .map(([key, value], index) => (
+                  <ListboxItem
+                    key={String(index)}
+                    description={key}
+                    className="cursor-default"
+                    textValue={value}
+                  >
+                    {value}
+                  </ListboxItem>
+                ))}
             </Listbox>
           </div>
         </Card>

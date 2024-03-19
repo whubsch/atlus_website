@@ -30,6 +30,7 @@ def test_get_main() -> None:
     response = client.get("/")
     assert response.status_code == 200
 
+
 @pytest.mark.parametrize("add", test_adds)
 def test_post_parse(add: str) -> None:
     """Test single address endpoint."""
@@ -39,6 +40,9 @@ def test_post_parse(add: str) -> None:
 
 def test_post_batch() -> None:
     """Test batch addresses endpoint."""
-    response = client.post("/api/batch/", json=[{"address": each, "@id": oid} for each, oid in enumerate(test_adds)])
+    response = client.post(
+        "/api/batch/",
+        json=[{"address": each, "@id": oid} for each, oid in enumerate(test_adds)],
+    )
     assert response.status_code == 200
     assert response.json() == {}

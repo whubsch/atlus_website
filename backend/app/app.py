@@ -4,8 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationError
 
-from pydantic_core import ErrorDetails
-from usaddress import RepeatedLabelError
+import regex
 
 from app.process import process
 
@@ -20,6 +19,7 @@ origins = [
     "127.0.0.1:5000",
     "http://localhost",
     "localhost",
+    "http://localhost:5173",
 ]
 
 
@@ -124,6 +124,56 @@ class AddressListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
+class PhoneInput(BaseModel):
+    phone: str = Field(
+        description="The raw phone string that needs to be parsed.",
+        examples=[
+            "1234567890",
+            "545-098-0988",
+            "+1 (908) 930-3099",
+        ],
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with outputs.",
+        default=0,
+    )
+
+
+class ErrorPhoneReturn(PhoneInput):
+    error: str = Field(
+        default="Unparseable",
+        description="The raw phone string that needs to be parsed.",
+    )
+
+
+class PhoneReturnBase(BaseModel):
+    phone: str = Field(
+        description="The raw phone string that needs to be parsed.",
+        examples=[
+            "1234567890",
+            "545-098-0988",
+            "+1 (908) 930-3099",
+        ],
+        pattern=r"^\+1 [0-9]{3}-[0-9]{3}-[0-9]{4}$",
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with outputs.",
+        default=0,
+    )
+
+
+class PhoneReturn(BaseModel):
+    data: PhoneReturnBase | ErrorPhoneReturn
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
+class PhoneListReturn(BaseModel):
+    data: list[PhoneReturnBase | ErrorPhoneReturn]
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
 @app.get("/", response_class=FileResponse)
 async def base() -> FileResponse:
     """Display single-page React frontend."""
@@ -149,19 +199,44 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     return add_return
 
 
-@app.post("/api/parse/", response_model_exclude_none=True)
+@app.post("/address/parse/", response_model_exclude_none=True)
 async def single(address: AddressInput) -> AddressReturn:
     """Return a single parsed address."""
     return AddressReturn(data=validate(address))
 
 
-@app.post("/api/batch/", response_model_exclude_none=True)
+@app.post("/address/batch/", response_model_exclude_none=True)
 async def batch(addresses: list[AddressInput]) -> AddressListReturn:
     """Return a batch of parsed addresses."""
     if len({i.oid for i in addresses}) != len(addresses):
         raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
 
-    cleaned = []
-    for address in addresses:
-        cleaned.append(validate(address))
+    cleaned = [validate(address) for address in addresses]
     return AddressListReturn(data=cleaned)
+
+
+def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
+    """Help to format."""
+    phone_valid = regex.search(
+        r"^\(?(?:\+? ?1?[ -.]*)?(?:\(?([0-9]{3})\)?[ -.]*)([0-9]{3})[ -.]*([0-9]{4})$",
+        phone.phone,
+    )
+    if phone_valid:
+        phone_new = (
+            f"+1 {phone_valid.group(1)}-{phone_valid.group(2)}-{phone_valid.group(3)}"
+        )
+        return PhoneReturnBase.model_validate({"phone": phone_new, "@id": phone.oid})
+    return ErrorPhoneReturn.model_validate({"phone": phone.phone, "@id": phone.oid})
+
+
+@app.post("/phone/parse/", response_model_exclude_none=True)
+async def phone_parse(phone: PhoneInput) -> PhoneReturn:
+    """Format US and Canada phone numbers."""
+    return PhoneReturn(data=phone_process(phone))
+
+
+@app.post("/phone/batch/", response_model_exclude_none=True)
+async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
+    """Format US and Canada phone numbers."""
+    cleaned = [phone_process(phone) for phone in phones]
+    return PhoneListReturn(data=cleaned)
