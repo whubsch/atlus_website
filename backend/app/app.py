@@ -174,10 +174,10 @@ class PhoneListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
-@app.get("/", response_class=FileResponse)
-async def base() -> FileResponse:
-    """Display single-page React frontend."""
-    return FileResponse("../atlus/dist/index.html")
+# @app.get("/", response_class=FileResponse)
+# async def base() -> FileResponse:
+#     """Display single-page React frontend."""
+#     return FileResponse("../atlus/dist/index.html")
 
 
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:

@@ -17,7 +17,7 @@ import CopyAllIcon from "@mui/icons-material/CopyAll";
 import SwitchAccessShortcutIcon from "@mui/icons-material/SwitchAccessShortcut";
 import CheckIcon from "@mui/icons-material/Check";
 
-const strings = [
+const addr_strs = [
   "123 Main St, Springfield, IL 62701",
   "1500 Pennsylvania Ave NW, Washington, DC 20220, United States",
   "456 Elm Ave, Anytown, NY 12345",
@@ -36,6 +36,15 @@ const strings = [
   "777 Strawberry Street, Mountainview, OR 25874",
 ];
 
+const phone_strs = [
+  "+1 (909) 2988892",
+  "17379089203",
+  "1.223.394.3983",
+  "282-203-2988",
+  "1 902 989 2837",
+  "9389209876",
+];
+
 function App() {
   const [inputValue, setInputValue] = useState<string>("");
   const [response, setResponse] = useState<string>("");
@@ -51,8 +60,9 @@ function App() {
   };
 
   const handleRandom = () => {
-    const randomIndex = Math.floor(Math.random() * strings.length);
-    setInputValue(strings[randomIndex]);
+    const use_strs = selectedTab === "address" ? addr_strs : phone_strs;
+    const randomIndex = Math.floor(Math.random() * use_strs.length);
+    setInputValue(use_strs[randomIndex]);
   };
 
   const handleSubmit = async () => {
