@@ -41,7 +41,7 @@ function App() {
   const [response, setResponse] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<string>("address");
+  const [selectedTab, setSelectedTab] = useState<string | number>("address");
 
   const tabs = ["address", "phone"];
   const clearAll = () => {
