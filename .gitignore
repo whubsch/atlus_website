@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 
+letsencrypt/
+
 # Ignore virtual environment folders
 venv/
 env/

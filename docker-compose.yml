@@ -1,28 +1,42 @@
 version: '3'
 
 services:
-  fastapi-app:
-    build:
-      context: ./backend
-    ports:
-      - "5000:5000"
-
-  react-app:
+  reactapp:
     build:
       context: ./atlus
-    ports:
-      - "5173:5173"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.react.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.services.react.loadbalancer.server.port=5173"
+      - "traefik.http.routers.react.entrypoints=websecure"
+      - "traefik.http.routers.react.tls.certresolver=myresolver"
 
-  traefik:
-    image: "traefik:v3.0"
-    container_name: "traefik"
+  fastapiapp:
+    build:
+      context: ./backend
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && PathRegexp(`/[a-z]+`)"
+      - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && (PathPrefix(`/address`) || PathPrefix(`/phone`) || PathPrefix(`/docs`))"
+      - "traefik.http.services.fast.loadbalancer.server.port=5000"
+      - "traefik.http.routers.fast.entrypoints=websecure"
+      - "traefik.http.routers.fast.tls.certresolver=myresolver"
+
+  rproxy:
+    image: traefik:v3.0
     command:
       - "--api.insecure=true"
-      - "--providers.docker=true"
+      - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
