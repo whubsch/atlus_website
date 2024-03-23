@@ -68,7 +68,7 @@ function App() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const apiUrl = `/${selectedTab}/parse/`;
+      const apiUrl = `${window.location.origin}/api/${selectedTab}/parse/`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {

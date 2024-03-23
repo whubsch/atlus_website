@@ -17,7 +17,7 @@ services:
     labels:
       - "traefik.enable=true"
       # - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && PathRegexp(`/[a-z]+`)"
-      - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && (PathPrefix(`/address`) || PathPrefix(`/phone`) || PathPrefix(`/docs`))"
+      - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`))"
       - "traefik.http.services.fast.loadbalancer.server.port=5000"
       - "traefik.http.routers.fast.entrypoints=websecure"
       - "traefik.http.routers.fast.tls.certresolver=myresolver"

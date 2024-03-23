@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi import HTTPException
@@ -8,27 +8,7 @@ import regex
 
 from app.process import process
 
-
-app = FastAPI()
-
-
-origins = [
-    "http://localhost:5000",
-    "localhost:5000",
-    "http://127.0.0.1:5000",
-    "127.0.0.1:5000",
-    "http://localhost",
-    "localhost",
-    "http://localhost:5173",
-]
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-)
+router = APIRouter()
 
 
 class ApiMeta(BaseModel):
@@ -199,13 +179,13 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     return add_return
 
 
-@app.post("/address/parse/", response_model_exclude_none=True)
+@router.post("/address/parse/", response_model_exclude_none=True)
 async def single(address: AddressInput) -> AddressReturn:
     """Return a single parsed address."""
     return AddressReturn(data=validate(address))
 
 
-@app.post("/address/batch/", response_model_exclude_none=True)
+@router.post("/address/batch/", response_model_exclude_none=True)
 async def batch(addresses: list[AddressInput]) -> AddressListReturn:
     """Return a batch of parsed addresses."""
     if len({i.oid for i in addresses}) != len(addresses):
@@ -229,14 +209,37 @@ def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
     return ErrorPhoneReturn.model_validate({"phone": phone.phone, "@id": phone.oid})
 
 
-@app.post("/phone/parse/", response_model_exclude_none=True)
+@router.post("/phone/parse/", response_model_exclude_none=True)
 async def phone_parse(phone: PhoneInput) -> PhoneReturn:
     """Format US and Canada phone numbers."""
     return PhoneReturn(data=phone_process(phone))
 
 
-@app.post("/phone/batch/", response_model_exclude_none=True)
+@router.post("/phone/batch/", response_model_exclude_none=True)
 async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
     """Format US and Canada phone numbers."""
     cleaned = [phone_process(phone) for phone in phones]
     return PhoneListReturn(data=cleaned)
+
+
+app = FastAPI()
+
+app.include_router(router=router, prefix="/api")
+
+origins = [
+    "http://localhost:5000",
+    "localhost:5000",
+    "http://127.0.0.1:5000",
+    "127.0.0.1:5000",
+    "http://localhost",
+    "localhost",
+    "http://localhost:5173",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+)
