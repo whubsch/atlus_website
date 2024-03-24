@@ -1,6 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.headline {
+  font-family: Spline Sans Mono, system-ui, Arial, sans-serif;
+}
 
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

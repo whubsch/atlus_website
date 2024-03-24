@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import "./App.css";
 // import Intro from "./components/Intro";
 import {
@@ -16,6 +16,7 @@ import {
 import CopyAllIcon from "@mui/icons-material/CopyAll";
 import SwitchAccessShortcutIcon from "@mui/icons-material/SwitchAccessShortcut";
 import CheckIcon from "@mui/icons-material/Check";
+import Intro from "./components/Intro";
 
 const addr_strs = [
   "123 Main St, Springfield, IL 62701",
@@ -68,7 +69,13 @@ function App() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const apiUrl = `${window.location.origin}/api/${selectedTab}/parse/`;
+      const urlBase = `${
+        window.location.hostname === "localhost" &&
+        window.location.protocol === "http:"
+          ? window.location.protocol + "//localhost:5000"
+          : window.location.origin
+      }/api`;
+      const apiUrl = `${urlBase}/${selectedTab}/parse/`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -94,7 +101,12 @@ function App() {
     setInputValue(event.target.value);
   };
 
-  const handleClick = () => {
+  const handleClick = (
+    event:
+      | React.FormEvent<FormEvent>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
     if (inputValue.trim() === "") {
       handleRandom();
     } else {
@@ -104,131 +116,146 @@ function App() {
 
   const clipboardCopy = () => {
     setCopied(true);
-    const text = Object.entries(response).map(
-      ([key, value]) => `${key}=${value}`
-    );
+    const text = Object.entries(response)
+      .filter(([key, _]) => key !== "@removed")
+      .map(([key, value]) => `${key}=${value}`);
     navigator.clipboard.writeText(text.join("\n"));
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 5000);
   };
 
   return (
-    <div className="flex flex-col justify-center items-center py-20 px-4">
-      <img
-        src="/logo_white.png"
-        alt="Atlus logo"
-        className="mb-4 w-2/3 md:w-1/4"
-      />
-      <h1 className="text-3xl font-bold mb-4">Atlus</h1>
+    <>
+      <div className="flex flex-col justify-center items-center py-20 px-4 gap-6">
+        <div className="py-4">
+          <div className="max-sm:hidden flex flex-row gap-6 place-content-center items-center">
+            <img src="/logo_white.png" alt="Atlus logo" className="mb-4 w-20" />
+            <h1 className="text-7xl font-bold mb-4 headline">Atlus</h1>
+          </div>
+          <div className="md:hidden flex flex-col items-center justify-center">
+            <img
+              src="/logo_white.png"
+              alt="Atlus logo"
+              className="mb-4 h-24 md:w-1/4"
+            />
+            <h1 className="text-5xl font-bold mb-4 headline">Atlus</h1>
+          </div>
+        </div>
 
-      <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3">
-        <Card className="p-6 z-10 rounded-lg overflow-hidden">
-          <CardBody>
-            <Tabs
-              selectedKey={selectedTab}
-              onSelectionChange={setSelectedTab}
-              className="place-content-center p-2"
-            >
-              {tabs.map((tab) => (
-                <Tab
-                  key={tab}
-                  title={tab}
-                  className="text-transform capitalize"
-                ></Tab>
-              ))}
-            </Tabs>
-            <div className="flex flex-wrap max-sm:hidden md:flex-nowrap gap-2">
-              <Input
-                type="text"
-                size="md"
-                label="Input"
-                value={inputValue}
-                onChange={handleInputChange}
-                endContent={
-                  <Button
-                    color="primary"
-                    size="md"
-                    className="h-full w-4 md:w-auto"
-                    onClick={handleClick}
-                  >
-                    {!inputValue ? (
-                      <SwitchAccessShortcutIcon />
-                    ) : (
-                      <>{!loading ? "Submit" : <Spinner color="default" />}</>
-                    )}
-                  </Button>
-                }
-              />
-            </div>
-            <div className="flex flex-wrap gap-2 md:hidden">
-              <Input
-                type="text"
-                size="md"
-                label="Input"
-                value={inputValue}
-                onChange={handleInputChange}
-              />
+        <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
+          <Card className="p-4 z-50 rounded-lg">
+            <CardBody className="gap-4">
+              <Tabs
+                selectedKey={selectedTab}
+                onSelectionChange={setSelectedTab}
+                className="place-content-center px-2"
+              >
+                {tabs.map((tab) => (
+                  <Tab
+                    key={tab}
+                    title={tab}
+                    className="text-transform capitalize"
+                  ></Tab>
+                ))}
+              </Tabs>
+              <form className="flex flex-wrap max-sm:hidden md:flex-nowrap gap-2">
+                <Input
+                  type="text"
+                  size="md"
+                  label="Input"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  endContent={
+                    <Button
+                      color="primary"
+                      size="md"
+                      type={inputValue ? "submit" : "button"}
+                      className="h-full w-4 md:w-auto"
+                      onClick={handleClick}
+                    >
+                      {!inputValue ? (
+                        <SwitchAccessShortcutIcon />
+                      ) : (
+                        <>{!loading ? "Submit" : <Spinner color="default" />}</>
+                      )}
+                    </Button>
+                  }
+                />
+              </form>
+              <div className="flex flex-wrap gap-2 md:hidden">
+                <Input
+                  type="text"
+                  size="md"
+                  label="Input"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                />
+                <Button
+                  color="primary"
+                  size="md"
+                  className="h-10 md:h-14 w-full md:w-auto"
+                  onClick={handleClick}
+                >
+                  {!inputValue ? (
+                    <SwitchAccessShortcutIcon />
+                  ) : (
+                    <>{!loading ? "Submit" : <Spinner color="default" />}</>
+                  )}
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+          <Card
+            className={`p-6 rounded-lg inset-x-0 top-0 absolute z-20 block ${
+              !response ? "translate-y-0" : "translate-y-60 md:translate-y-48"
+            }`}
+          >
+            <div className="flex justify-between gap-2 p-2">
+              <Button
+                color="default"
+                size="sm"
+                onClick={clearAll}
+                className="w-1/2"
+              >
+                Clear
+              </Button>
               <Button
                 color="primary"
-                size="md"
-                className="h-10 md:h-14 w-full md:w-auto"
-                onClick={handleClick}
+                size="sm"
+                onClick={clipboardCopy}
+                endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
+                className="w-1/2"
               >
-                {!inputValue ? (
-                  <SwitchAccessShortcutIcon />
-                ) : (
-                  <>{!loading ? "Submit" : <Spinner color="default" />}</>
-                )}
+                {copied ? "Copied" : "Copy"}
               </Button>
             </div>
-          </CardBody>
-        </Card>
-        <Card
-          className={`p-6 z-0 rounded-lg inset-x-0 top-0 absolute ${
-            !response ? "translate-y-0" : "translate-y-60 md:translate-y-48"
-          }`}
-        >
-          <div className="flex justify-between gap-2 p-2">
-            <Button
-              color="default"
-              size="sm"
-              onClick={clearAll}
-              className="w-1/2"
-            >
-              Clear
-            </Button>
-            <Button
-              color="primary"
-              size="sm"
-              onClick={clipboardCopy}
-              endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
-              className="w-1/2"
-            >
-              {copied ? "Copied" : "Copy"}
-            </Button>
-          </div>
-          <div className="flex flex-wrap">
-            <Listbox
-              variant="flat"
-              aria-label="List displaying parsed address"
-              emptyContent={null}
-            >
-              {Object.entries(response)
-                .filter(([key, _]) => key !== "@removed")
-                .map(([key, value], index) => (
-                  <ListboxItem
-                    key={String(index)}
-                    description={key}
-                    className="cursor-default"
-                    textValue={value}
-                  >
-                    {value}
-                  </ListboxItem>
-                ))}
-            </Listbox>
-          </div>
-        </Card>
+            <div className="flex flex-wrap">
+              <Listbox
+                variant="flat"
+                aria-label="List displaying parsed address"
+                emptyContent={null}
+              >
+                {Object.entries(response)
+                  .filter(([key, _]) => key !== "@removed")
+                  .map(([key, value], index) => (
+                    <ListboxItem
+                      key={String(index)}
+                      description={key}
+                      className="cursor-default"
+                      textValue={value}
+                    >
+                      {value}
+                    </ListboxItem>
+                  ))}
+              </Listbox>
+            </div>
+          </Card>
+        </div>
       </div>
-      {/* <Intro /> */}
-    </div>
+      <Intro classes={`${!response ? "translate-y-0" : "translate-y-80"}`} />
+    </>
   );
 }
 
