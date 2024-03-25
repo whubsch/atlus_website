@@ -1,0 +1,6 @@
+test*.py
+*scratch*.py
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc

@@ -1,6 +1,10 @@
 version: '3'
 
 services:
+  update:
+    build:
+      context: ./update
+
   reactapp:
     build:
       context: ./atlus
