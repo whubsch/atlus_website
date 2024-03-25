@@ -11,12 +11,15 @@ import {
   ListboxItem,
   Tabs,
   Tab,
+  Chip,
 } from "@nextui-org/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
 import SwitchAccessShortcutIcon from "@mui/icons-material/SwitchAccessShortcut";
 import CheckIcon from "@mui/icons-material/Check";
+import ErrorSharpIcon from "@mui/icons-material/ErrorSharp";
 import Intro from "./components/Intro";
+import LogoHeader from "./components/LogoHeader";
 
 const addr_strs = [
   "123 Main St, Springfield, IL 62701",
@@ -129,21 +132,7 @@ function App() {
   return (
     <>
       <div className="flex flex-col justify-center items-center py-20 px-4 gap-6">
-        <div className="py-4">
-          <div className="max-sm:hidden flex flex-row gap-6 place-content-center items-center">
-            <img src="/logo_white.png" alt="Atlus logo" className="mb-4 w-20" />
-            <h1 className="text-7xl font-bold mb-4 headline">Atlus</h1>
-          </div>
-          <div className="md:hidden flex flex-col items-center justify-center">
-            <img
-              src="/logo_white.png"
-              alt="Atlus logo"
-              className="mb-4 h-24 md:w-1/4"
-            />
-            <h1 className="text-5xl font-bold mb-4 headline">Atlus</h1>
-          </div>
-        </div>
-
+        <LogoHeader />
         <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
           <Card className="p-4 z-50 rounded-lg">
             <CardBody className="gap-4">
@@ -250,6 +239,22 @@ function App() {
                     </ListboxItem>
                   ))}
               </Listbox>
+              <div className="flex gap-2 p-2">
+                {Object.entries(response)
+                  .filter(([key, _]) => key === "@removed")
+                  .map(([_, value], index) =>
+                    value.map((tag) => (
+                      <Chip
+                        color="danger"
+                        size="sm"
+                        startContent={<ErrorSharpIcon />}
+                        key={`${value}${index}`}
+                      >
+                        {tag}
+                      </Chip>
+                    ))
+                  )}
+              </div>
             </div>
           </Card>
         </div>
