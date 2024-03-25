@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  update:
+  ddns:
     build:
-      context: ./update
+      context: ./ddns
 
   reactapp:
     build:
