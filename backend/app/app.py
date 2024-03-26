@@ -179,6 +179,12 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     return add_return
 
 
+@router.get("/")
+async def meta() -> ApiMeta:
+    """Return meta information."""
+    return ApiMeta()
+
+
 @router.post("/address/parse/", response_model_exclude_none=True)
 async def single(address: AddressInput) -> AddressReturn:
     """Return a single parsed address."""

@@ -14,7 +14,7 @@ const Perk: React.FC<PerkProps> = ({ icon, title, description }) => {
         <h3 className="text-xl text-center leading-9 font-extrabold capitalize">
           {title}
         </h3>
-        <p className="text-justify">{description}</p>
+        <p>{description}</p>
       </CardBody>
     </Card>
   );

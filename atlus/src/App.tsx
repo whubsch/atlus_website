@@ -17,6 +17,8 @@ import CopyAllIcon from "@mui/icons-material/CopyAll";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckIcon from "@mui/icons-material/Check";
 import ErrorSharpIcon from "@mui/icons-material/ErrorSharp";
+import InfoIcon from "@mui/icons-material/Info";
+
 import Intro from "./components/Intro";
 import LogoHeader from "./components/LogoHeader";
 import { addr_strs, phone_strs } from "./statics";
@@ -32,13 +34,41 @@ interface responseInt {
   "@removed"?: string[];
 }
 
+interface metaInt {
+  version?: string;
+  status?: string;
+}
+
 function App() {
   const [inputValue, setInputValue] = useState<string>("");
+  const [apiMeta, setApiMeta] = useState<metaInt>({});
   const [response, setResponse] = useState<responseInt>({});
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
 
+  const urlBase = `${
+    window.location.hostname === "localhost" &&
+    window.location.protocol === "http:"
+      ? window.location.protocol + "//localhost:5000"
+      : window.location.origin
+  }/api`;
+
+  const getMeta = async () => {
+    try {
+      setLoading(true);
+      const apiUrl = `${urlBase}/`;
+      const myResponse = await fetch(apiUrl, {
+        method: "GET",
+        mode: "cors",
+      });
+
+      const data = await myResponse.json();
+      setApiMeta(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   const tabs = ["address", "phone"];
   const clearAll = () => {
     setInputValue("");
@@ -54,13 +84,8 @@ function App() {
 
   const handleSubmit = async () => {
     try {
+      getMeta();
       setLoading(true);
-      const urlBase = `${
-        window.location.hostname === "localhost" &&
-        window.location.protocol === "http:"
-          ? window.location.protocol + "//localhost:5000"
-          : window.location.origin
-      }/api`;
       const apiUrl = `${urlBase}/${selectedTab}/parse/`;
       const myResponse = await fetch(apiUrl, {
         method: "POST",
@@ -227,7 +252,11 @@ function App() {
                     </ListboxItem>
                   ))}
               </Listbox>
-              <div className="flex gap-2 p-2">
+              <div
+                className={`flex gap-2 p-2${
+                  response["@removed"]?.length === 0 ? " hidden" : ""
+                }`}
+              >
                 {response["@removed"]
                   ? response["@removed"].map((tag: string) => (
                       <Chip
@@ -241,6 +270,15 @@ function App() {
                     ))
                   : null}
               </div>
+              {apiMeta?.status === "OK" ? (
+                <div>
+                  <Chip size="sm" startContent={<InfoIcon />}>
+                    {apiMeta?.version}
+                  </Chip>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
           </Card>
         </div>
