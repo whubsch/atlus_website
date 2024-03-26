@@ -23,7 +23,7 @@ const Intro: React.FC<SubComponentProps> = ({ classes }) => {
           OpenStreetMap-compatible tags.
         </p>
       </div>
-      <div className="flex flex-wrap gap-8 md:gap-14 py-6 sm:px-8 lg:px-10 px-4 sm:px-6 lg:px-8 place-content-center">
+      <div className="flex flex-wrap gap-8 md:gap-14 py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 place-content-center">
         <Perk
           title={"efficient"}
           icon={<HistoryToggleOffIcon sx={{ fontSize: "4em" }} />}

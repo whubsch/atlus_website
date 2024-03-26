@@ -1,6 +1,5 @@
 import { FormEvent, useState } from "react";
 import "./App.css";
-// import Intro from "./components/Intro";
 import {
   Button,
   Input,
@@ -15,43 +14,27 @@ import {
 } from "@nextui-org/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
-import SwitchAccessShortcutIcon from "@mui/icons-material/SwitchAccessShortcut";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckIcon from "@mui/icons-material/Check";
 import ErrorSharpIcon from "@mui/icons-material/ErrorSharp";
 import Intro from "./components/Intro";
 import LogoHeader from "./components/LogoHeader";
+import { addr_strs, phone_strs } from "./statics";
 
-const addr_strs = [
-  "123 Main St, Springfield, IL 62701",
-  "1500 Pennsylvania Ave NW, Washington, DC 20220, United States",
-  "456 Elm Ave, Anytown, NY 12345",
-  "789 Oak Dr, Smallville California, 98765",
-  "101 W. Pine St Bigtown Texas 54321",
-  "234 Cedar Hwy Suite 2, W. Des Moines, IA",
-  "345 MAPLE RD, COUNTRYSIDE, PA 24680-0198",
-  "678 MLK Blvd, Suburbia, Ohio 97531",
-  "890 St Mary St, Metropolis, GA 86420",
-  "111 N.E. Cherry St, Villageton, Michigan 36912",
-  "222 NW Pineapple Ave, Beachville, SC 75309",
-  "333 Orange Blvd, Riverside Arizona 80203",
-  "444 Grape St SE, Hilltop, NV 46895 Unit B",
-  "158 S. Thomas Court, Marietta, GA 30008",
-  "666 BANANA AVE LAKESIDE NEW MEXICO 36921",
-  "777 Strawberry Street, Mountainview, OR 25874",
-];
-
-const phone_strs = [
-  "+1 (909) 2988892",
-  "17379089203",
-  "1.223.394.3983",
-  "282-203-2988",
-  "1 902 989 2837",
-  "9389209876",
-];
+interface responseInt {
+  "addr:housenumber"?: string;
+  "addr:street"?: string;
+  "addr:unit"?: string;
+  "addr:city"?: string;
+  "addr:postcode"?: string;
+  "addr:state"?: string;
+  phone?: string;
+  "@removed"?: string[];
+}
 
 function App() {
   const [inputValue, setInputValue] = useState<string>("");
-  const [response, setResponse] = useState<string>("");
+  const [response, setResponse] = useState<responseInt>({});
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
@@ -59,7 +42,7 @@ function App() {
   const tabs = ["address", "phone"];
   const clearAll = () => {
     setInputValue("");
-    setResponse("");
+    setResponse({});
     setCopied(false);
   };
 
@@ -79,7 +62,7 @@ function App() {
           : window.location.origin
       }/api`;
       const apiUrl = `${urlBase}/${selectedTab}/parse/`;
-      const response = await fetch(apiUrl, {
+      const myResponse = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +72,7 @@ function App() {
         mode: "cors",
       });
 
-      const data = await response.json();
+      const data = await myResponse.json();
       const tags = data.data;
       delete tags["@id"];
       setResponse(tags);
@@ -131,7 +114,7 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center py-20 px-4 gap-6">
+      <div className="flex flex-col justify-center items-center py-20 px-4 gap-6 sm:py-44">
         <LogoHeader />
         <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
           <Card className="p-4 z-50 rounded-lg">
@@ -146,10 +129,11 @@ function App() {
                     key={tab}
                     title={tab}
                     className="text-transform capitalize"
-                  ></Tab>
+                  />
                 ))}
               </Tabs>
-              <form className="flex flex-wrap max-sm:hidden md:flex-nowrap gap-2">
+              <form className="flex flex-wrap max-md:hidden md:flex-nowrap gap-2">
+                {/* large screen, button inside */}
                 <Input
                   type="text"
                   size="md"
@@ -165,7 +149,7 @@ function App() {
                       onClick={handleClick}
                     >
                       {!inputValue ? (
-                        <SwitchAccessShortcutIcon />
+                        <AutoFixHighIcon />
                       ) : (
                         <>{!loading ? "Submit" : <Spinner color="default" />}</>
                       )}
@@ -173,7 +157,8 @@ function App() {
                   }
                 />
               </form>
-              <div className="flex flex-wrap gap-2 md:hidden">
+              <form className="flex flex-wrap gap-2 md:hidden">
+                {/* small screen, button below */}
                 <Input
                   type="text"
                   size="md"
@@ -184,21 +169,24 @@ function App() {
                 <Button
                   color="primary"
                   size="md"
+                  type={inputValue ? "submit" : "button"}
                   className="h-10 md:h-14 w-full md:w-auto"
                   onClick={handleClick}
                 >
                   {!inputValue ? (
-                    <SwitchAccessShortcutIcon />
+                    <AutoFixHighIcon />
                   ) : (
                     <>{!loading ? "Submit" : <Spinner color="default" />}</>
                   )}
                 </Button>
-              </div>
+              </form>
             </CardBody>
           </Card>
           <Card
-            className={`p-6 rounded-lg inset-x-0 top-0 absolute z-20 block ${
-              !response ? "translate-y-0" : "translate-y-60 md:translate-y-48"
+            className={`p-6 rounded-lg inset-x-0 top-0 z-20 block ${
+              Object.keys(response).length === 0
+                ? "translate-y-0 absolute"
+                : "translate-y-4"
             }`}
           >
             <div className="flex justify-between gap-2 p-2">
@@ -240,26 +228,24 @@ function App() {
                   ))}
               </Listbox>
               <div className="flex gap-2 p-2">
-                {Object.entries(response)
-                  .filter(([key, _]) => key === "@removed")
-                  .map(([_, value], index) =>
-                    value.map((tag) => (
+                {response["@removed"]
+                  ? response["@removed"].map((tag: string) => (
                       <Chip
                         color="danger"
                         size="sm"
                         startContent={<ErrorSharpIcon />}
-                        key={`${value}${index}`}
+                        key={`${tag}`}
                       >
                         {tag}
                       </Chip>
                     ))
-                  )}
+                  : null}
               </div>
             </div>
           </Card>
         </div>
       </div>
-      <Intro classes={`${!response ? "translate-y-0" : "translate-y-80"}`} />
+      <Intro classes={`${Object.keys(response).length === 0 ? "" : ""}`} />
     </>
   );
 }
