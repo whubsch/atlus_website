@@ -225,6 +225,9 @@ async def phone_parse(phone: PhoneInput) -> PhoneReturn:
 @router.post("/phone/batch/", response_model_exclude_none=True)
 async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
     """Format US and Canada phone numbers."""
+    if len({i.oid for i in phones}) != len(phones):
+        raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
+
     cleaned = [phone_process(phone) for phone in phones]
     return PhoneListReturn(data=cleaned)
 

@@ -1,8 +1,21 @@
 {
   "name": "atlus",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/whubsch/atlus",
+  "keywords": [
+    "openstreetmap",
+    "address",
+    "parse",
+    "tags",
+    "phone"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whubsch/atlus.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
