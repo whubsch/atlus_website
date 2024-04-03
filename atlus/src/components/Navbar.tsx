@@ -10,9 +10,9 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 
 export default function AtlusNav() {
   return (
-    <Navbar>
+    <Navbar className="z-50">
       <NavbarBrand>
-        <p className="font-bold text-inherit">Atlus</p>
+        <p className="font-bold text-inherit headline">Atlus</p>
       </NavbarBrand>
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
@@ -21,7 +21,7 @@ export default function AtlusNav() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="/docs" variant="flat">
+          <Button as={Link} color="primary" href="/docs">
             Docs
           </Button>
         </NavbarItem>

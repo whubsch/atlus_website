@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, ValidationError
 import regex
 
 from app.process import process
+from . import version
 
 router = APIRouter()
 
@@ -14,7 +15,7 @@ router = APIRouter()
 class ApiMeta(BaseModel):
     """Define basic API features."""
 
-    version: str = Field(default="0.1.0")
+    version: str = Field(default=version)
     status: str = Field(default="OK")
 
 

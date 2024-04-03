@@ -22,6 +22,9 @@ import InfoIcon from "@mui/icons-material/Info";
 import Intro from "./components/Intro";
 import LogoHeader from "./components/LogoHeader";
 import { addr_strs, phone_strs } from "./statics";
+import Footer from "./components/Footer";
+
+const version = "0.1.0";
 
 interface responseInt {
   "addr:housenumber"?: string;
@@ -54,21 +57,6 @@ function App() {
       : window.location.origin
   }/api`;
 
-  const getMeta = async () => {
-    try {
-      setLoading(true);
-      const apiUrl = `${urlBase}/`;
-      const myResponse = await fetch(apiUrl, {
-        method: "GET",
-        mode: "cors",
-      });
-
-      const data = await myResponse.json();
-      setApiMeta(data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
   const tabs = ["address", "phone"];
   const clearAll = () => {
     setInputValue("");
@@ -84,7 +72,6 @@ function App() {
 
   const handleSubmit = async () => {
     try {
-      getMeta();
       setLoading(true);
       const apiUrl = `${urlBase}/${selectedTab}/parse/`;
       const myResponse = await fetch(apiUrl, {
@@ -101,6 +88,7 @@ function App() {
       const tags = data.data;
       delete tags["@id"];
       setResponse(tags);
+      setApiMeta(data.meta);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -142,7 +130,7 @@ function App() {
       <div className="flex flex-col justify-center items-center py-20 px-4 gap-6 sm:py-44">
         <LogoHeader />
         <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
-          <Card className="p-4 z-50 rounded-lg">
+          <Card className="p-4 z-40 rounded-lg">
             <CardBody className="gap-4">
               <Tabs
                 selectedKey={selectedTab}
@@ -254,36 +242,34 @@ function App() {
               </Listbox>
               <div
                 className={`flex gap-2 p-2${
-                  response["@removed"]?.length === 0 ? " hidden" : ""
+                  response["@removed"]?.length === 0 && " hidden"
                 }`}
               >
-                {response["@removed"]
-                  ? response["@removed"].map((tag: string) => (
-                      <Chip
-                        color="danger"
-                        size="sm"
-                        startContent={<ErrorSharpIcon />}
-                        key={`${tag}`}
-                      >
-                        {tag}
-                      </Chip>
-                    ))
-                  : null}
+                {response["@removed"] &&
+                  response["@removed"].map((tag: string) => (
+                    <Chip
+                      color="danger"
+                      size="sm"
+                      startContent={<ErrorSharpIcon />}
+                      key={`${tag}`}
+                    >
+                      {tag}
+                    </Chip>
+                  ))}
               </div>
-              {apiMeta?.status === "OK" ? (
+              {apiMeta?.status === "OK" && (
                 <div>
                   <Chip size="sm" startContent={<InfoIcon />}>
                     {apiMeta?.version}
                   </Chip>
                 </div>
-              ) : (
-                <></>
               )}
             </div>
           </Card>
         </div>
       </div>
-      <Intro classes={`${Object.keys(response).length === 0 ? "" : ""}`} />
+      <Intro classes={`${Object.keys(response).length === 0 && ""}`} />
+      <Footer version={version} />
     </>
   );
 }
