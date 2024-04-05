@@ -12,6 +12,8 @@ services:
       - "traefik.http.services.react.loadbalancer.server.port=5173"
       - "traefik.http.routers.react.entrypoints=websecure"
       - "traefik.http.routers.react.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirscheme.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirscheme.redirectscheme.permanent=true"
 
   fastapiapp:
     build:
