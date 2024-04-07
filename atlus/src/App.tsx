@@ -11,6 +11,7 @@ import {
   Tabs,
   Tab,
   Chip,
+  Tooltip,
 } from "@nextui-org/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
@@ -258,11 +259,20 @@ function App() {
                   ))}
               </div>
               {apiMeta?.status === "OK" && (
-                <div>
-                  <Chip size="sm" startContent={<InfoIcon />}>
-                    {apiMeta?.version}
-                  </Chip>
-                </div>
+                <>
+                  <div className="absolute bottom-0 right-0 max-md:hidden p-3">
+                    <Tooltip content={`API version ${apiMeta?.version}`}>
+                      <Button size="sm">
+                        <InfoIcon />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                  <div className="absolute bottom-0 right-0 md:hidden p-3">
+                    <Chip size="sm" startContent={<InfoIcon />}>
+                      {apiMeta?.version}
+                    </Chip>
+                  </div>
+                </>
               )}
             </div>
           </Card>
