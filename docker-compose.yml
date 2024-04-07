@@ -8,20 +8,34 @@ services:
       context: ./atlus
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.react.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.react.priority=3"
       - "traefik.http.services.react.loadbalancer.server.port=5173"
       - "traefik.http.routers.react.entrypoints=websecure"
       - "traefik.http.routers.react.tls.certresolver=myresolver"
+      - "traefik.http.routers.react.middlewares=stripwww,nonapihome"
+
+      # redirect to https
       - "traefik.http.middlewares.redirscheme.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirscheme.redirectscheme.permanent=true"
+
+      # strip `www` from path
+      - "traefik.http.middlewares.stripwww.redirectregex.regex=^(https?://)(?:www\\.)(${DOMAIN}.*)$"
+      - "traefik.http.middlewares.stripwww.redirectregex.replacement=$${1}$${2}"
+      - "traefik.http.middlewares.stripwww.redirectregex.permanent=true"
+
+      # redirect non-api, non-file URL paths to home
+      - "traefik.http.middlewares.nonapihome.redirectregex.regex=^(https?://${DOMAIN}/)[^.]*$"
+      - "traefik.http.middlewares.nonapihome.redirectregex.replacement=$$1"
+      - "traefik.http.middlewares.nonapihome.redirectregex.permanent=true"
 
   fastapiapp:
     build:
       context: ./backend
     labels:
       - "traefik.enable=true"
-      # - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && PathRegexp(`/[a-z]+`)"
-      - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/openapi`))"
+      - "traefik.http.routers.fast.rule=Host(`${DOMAIN}`) && PathRegexp(`/(?:api/?[^.]*|docs|openapi\\.json)$`)"
+      - "traefik.http.routers.fast.priority=5"
       - "traefik.http.services.fast.loadbalancer.server.port=5000"
       - "traefik.http.routers.fast.entrypoints=websecure"
       - "traefik.http.routers.fast.tls.certresolver=myresolver"

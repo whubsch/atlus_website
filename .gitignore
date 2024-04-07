@@ -37,6 +37,7 @@ Thumbs.db
 target/
 dist/
 build/
+.pytest_cache/
 
 # Ignore dependencies
 node_modules/
