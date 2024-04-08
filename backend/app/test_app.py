@@ -63,6 +63,7 @@ def test_post_phone_parse(phone: str) -> None:
     response = client.post("/api/phone/parse/", json={"phone": phone})
     assert response.status_code == 200
 
+
 def test_post_phone_batch() -> None:
     """Test batch phones endpoint."""
     response = client.post(

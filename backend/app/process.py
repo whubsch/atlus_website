@@ -66,7 +66,7 @@ def mc_replace(value: str) -> str:
 
 def ord_replace(value: str) -> str:
     """Fix string containing improperly capitalized ordinal."""
-    return regex.sub(r"(\b[0-9]+[SNRT][tTdDhH]\b)", lower_match, value)
+    return regex.sub(r"(\b\d+[SNRT][tTdDhH]\b)", lower_match, value)
 
 
 def name_street_expand(match: regex.Match) -> str:
@@ -85,6 +85,11 @@ def direct_expand(match: regex.Match) -> str:
     raise ValueError
 
 
+def cap_match(match: regex.Match) -> str:
+    """Make matches uppercase."""
+    return "".join(match.groups()).upper().replace(".", "")
+
+
 # pre-compile regex for speed
 ABBR_JOIN = "|".join(name_expand | street_expand)
 abbr_join_comp = regex.compile(
@@ -99,7 +104,7 @@ dir_fill_comp = regex.compile(
 )
 
 sr_comp = regex.compile(
-    r"(\bS\.?R\b\.?)(?= [0-9]+)",
+    r"(\bS\.?R\b\.?)(?= \d+)",
     flags=regex.IGNORECASE,
 )
 
@@ -109,10 +114,10 @@ saint_comp = regex.compile(
 )
 
 street_comp = regex.compile(
-    r"St\.?(?= [NESW]\.?[EW]?\.?)|(?<=[0-9][thndstr]{2} )St\.?\b|St\.?$"
+    r"St\.?(?= [NESW]\.?[EW]?\.?)|(?<=\d[thndstr]{2} )St\.?\b|St\.?$"
 )
 
-post_comp = regex.compile(r"([0-9]{5})-?0{4}")
+post_comp = regex.compile(r"(\d{5})-?0{4}")
 
 
 def abbrs(value: str) -> str:
@@ -140,7 +145,14 @@ def abbrs(value: str) -> str:
     # normalize 'US'
     value = regex.sub(
         r"\bU.[Ss].\B",
-        "US",
+        cap_match,
+        value,
+    )
+
+    # uppercase shortened street descriptors
+    value = regex.sub(
+        r"\b(C[rh]|S[rh]|[FR]m|Us)\b",
+        cap_match,
         value,
     )
 
@@ -281,6 +293,8 @@ def process(
 
     if "addr:postcode" in cleaned:
         # remove extraneous postcode digits
-        cleaned["addr:postcode"] = post_comp.sub(r"\1", cleaned["addr:postcode"])
+        cleaned["addr:postcode"] = post_comp.sub(
+            r"\1", cleaned["addr:postcode"]
+        ).replace(" ", "-")
 
     return cleaned, removed

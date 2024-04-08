@@ -143,6 +143,7 @@ function App() {
                     key={tab}
                     title={tab}
                     className="text-transform capitalize"
+                    aria-label={tab}
                   />
                 ))}
               </Tabs>
@@ -186,6 +187,7 @@ function App() {
                   type={inputValue ? "submit" : "button"}
                   className="h-10 md:h-14 w-full md:w-auto"
                   onClick={handleClick}
+                  aria-label={inputValue ? "Submit" : "Random sample"}
                 >
                   {!inputValue ? (
                     <AutoFixHighIcon />

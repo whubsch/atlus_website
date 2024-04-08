@@ -71,14 +71,14 @@ class AddressReturnBase(BaseModel):
     )
     addr_state: str | None = Field(
         alias="addr:state",
-        pattern="^[A-Z]{2}$",
+        pattern=r"^[A-Z]{2}$",
         description="The state or territory of the address.",
         examples=["CA"],
         default=None,
     )
     addr_postcode: str | None = Field(
         alias="addr:postcode",
-        pattern="^[0-9]{5}(?:-[0-9]{4})?$",
+        pattern=r"^\d{5}(?:\-\d{4})?$",
         description="The postal code of the address.",
         examples=["90012", "90012-4801"],
         default=None,
@@ -136,7 +136,7 @@ class PhoneReturnBase(BaseModel):
             "545-098-0988",
             "+1 (908) 930-3099",
         ],
-        pattern=r"^\+1 [0-9]{3}-[0-9]{3}-[0-9]{4}$",
+        pattern=r"^\+1 \d{3}-\d{3}-\d{4}$",
     )
     oid: int | str = Field(
         alias="@id",
@@ -153,12 +153,6 @@ class PhoneReturn(BaseModel):
 class PhoneListReturn(BaseModel):
     data: list[PhoneReturnBase | ErrorPhoneReturn]
     meta: ApiMeta = Field(default=ApiMeta())
-
-
-# @app.get("/", response_class=FileResponse)
-# async def base() -> FileResponse:
-#     """Display single-page React frontend."""
-#     return FileResponse("../atlus/dist/index.html")
 
 
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
@@ -205,7 +199,7 @@ async def batch(addresses: list[AddressInput]) -> AddressListReturn:
 def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
     """Help to format."""
     phone_valid = regex.search(
-        r"^\(?(?:\+? ?1?[ -.]*)?(?:\(?([0-9]{3})\)?[ -.]*)([0-9]{3})[ -.]*([0-9]{4})$",
+        r"^\(?(?:\+? ?1?[ -.]*)?(?:\(?(\d{3})\)?[ -.]*)(\d{3})[ -.]*(\d{4})$",
         phone.phone,
     )
     if phone_valid:
