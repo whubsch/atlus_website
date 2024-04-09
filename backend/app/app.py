@@ -167,7 +167,6 @@ def check_error(return_dict: dict[str, str | list]) -> bool:
     """Check if zero or one values are not None."""
     return_dict.pop("@removed", None)
     count = sum(1 for value in return_dict.values() if value is not None)
-    print(count)
     return bool(count)
 
 
