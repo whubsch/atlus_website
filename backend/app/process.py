@@ -119,10 +119,13 @@ street_comp = regex.compile(
 
 post_comp = regex.compile(r"(\d{5})-?0{4}")
 
+usa_comp = regex.compile(r",? (?:USA?|United States(?: of America)?|Canada)\b")
+
+paren_comp = regex.compile(r" ?\(.*\)")
 
 def abbrs(value: str) -> str:
     """Bundle most common abbreviation expansion functions."""
-    value = ord_replace(us_replace(mc_replace(get_title(value)))).replace("  ", " ")
+    value = ord_replace(us_replace(mc_replace(get_title(value))))
 
     # change likely 'St' to 'Saint'
     value = saint_comp.sub(
@@ -165,7 +168,7 @@ def abbrs(value: str) -> str:
 
     # expand 'SR' if no other street types
     value = sr_comp.sub("State Route", value)
-    return value.strip(" .").replace("  ", " ")
+    return value.strip(" .")
 
 
 def clean(old: str) -> str:
@@ -261,6 +264,9 @@ def process(
     address_string: str,
 ) -> tuple[OrderedDict[str, str | int], list[str | None]]:
     """Process address strings."""
+    address_string = address_string.replace("  ", " ").strip(" ,.")
+    address_string = usa_comp.sub("", address_string)
+    address_string = paren_comp.sub("", address_string)
     try:
         cleaned = usaddress.tag(clean(address_string), tag_mapping=osm_mapping)[0]
         removed = []
@@ -282,10 +288,10 @@ def process(
         cleaned["addr:city"] = abbrs(get_title(cleaned["addr:city"], single_word=True))
 
     if "addr:state" in cleaned:
-        old = cleaned["addr:state"].replace(".", "").removesuffix(", USA")
+        old = cleaned["addr:state"].replace(".", "")
         if old.upper() in state_expand:
             cleaned["addr:state"] = state_expand[old.upper()]
-        elif len(old) == 2:
+        elif len(old) == 2 and old.upper() in list(state_expand.values()):
             cleaned["addr:state"] = old.upper()
 
     if "addr:unit" in cleaned:

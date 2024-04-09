@@ -34,6 +34,10 @@ class AddressInput(BaseModel):
         default=0,
     )
 
+    def make_error(self):
+        """Convert to error submodel."""
+        return ErrorAddressReturn(**self.model_dump())
+
 
 class ErrorAddressReturn(AddressInput):
     error: str = Field(
@@ -120,6 +124,11 @@ class PhoneInput(BaseModel):
         default=0,
     )
 
+    def make_error(self):
+        """Convert to error submodel."""
+        return ErrorPhoneReturn(**self.model_dump())
+
+
 
 class ErrorPhoneReturn(PhoneInput):
     error: str = Field(
@@ -171,6 +180,8 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
         add_return = AddressReturnBase.model_validate(
             cleaned_ret | {"@id": content.oid, "@removed": bad_fields}
         )
+    if any(add_return.model_dump().values()):
+        return content.make_error()
     return add_return
 
 
@@ -207,7 +218,7 @@ def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
             f"+1 {phone_valid.group(1)}-{phone_valid.group(2)}-{phone_valid.group(3)}"
         )
         return PhoneReturnBase.model_validate({"phone": phone_new, "@id": phone.oid})
-    return ErrorPhoneReturn.model_validate({"phone": phone.phone, "@id": phone.oid})
+    return phone.make_error()
 
 
 @router.post("/phone/parse/", response_model_exclude_none=True)
