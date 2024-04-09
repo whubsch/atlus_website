@@ -123,6 +123,7 @@ usa_comp = regex.compile(r",? (?:USA?|United States(?: of America)?|Canada)\b")
 
 paren_comp = regex.compile(r" ?\(.*\)")
 
+
 def abbrs(value: str) -> str:
     """Bundle most common abbreviation expansion functions."""
     value = ord_replace(us_replace(mc_replace(get_title(value))))

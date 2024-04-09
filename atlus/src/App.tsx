@@ -12,6 +12,7 @@ import {
   Tab,
   Chip,
   Tooltip,
+  Code,
 } from "@nextui-org/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
@@ -19,6 +20,7 @@ import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckIcon from "@mui/icons-material/Check";
 import ErrorSharpIcon from "@mui/icons-material/ErrorSharp";
 import InfoIcon from "@mui/icons-material/Info";
+import ErrorIcon from "@mui/icons-material/Error";
 
 import Intro from "./components/Intro";
 import LogoHeader from "./components/LogoHeader";
@@ -36,6 +38,8 @@ interface responseInt {
   "addr:state"?: string;
   phone?: string;
   "@removed"?: string[];
+  address?: string;
+  error?: string;
 }
 
 interface metaInt {
@@ -50,6 +54,7 @@ function App() {
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
+  const [errorResp, setErrorResp] = useState<boolean>(false);
 
   const urlBase = `${
     window.location.hostname === "localhost" &&
@@ -63,6 +68,7 @@ function App() {
     setInputValue("");
     setResponse({});
     setCopied(false);
+    setErrorResp(false);
   };
 
   const handleRandom = () => {
@@ -90,6 +96,7 @@ function App() {
       delete tags["@id"];
       setResponse(tags);
       setApiMeta(data.meta);
+      setErrorResp(tags.error);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -215,34 +222,44 @@ function App() {
                 Clear
               </Button>
               <Button
-                color="primary"
+                color={errorResp ? "danger" : "primary"}
                 size="sm"
                 onClick={clipboardCopy}
                 endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
                 className="w-1/2"
+                disabled={errorResp}
               >
                 {copied ? "Copied" : "Copy"}
               </Button>
             </div>
             <div className="flex flex-wrap">
-              <Listbox
-                variant="flat"
-                aria-label="List displaying parsed address"
-                emptyContent={null}
-              >
-                {Object.entries(response)
-                  .filter(([key, _]) => key !== "@removed")
-                  .map(([key, value], index) => (
-                    <ListboxItem
-                      key={String(index)}
-                      description={key}
-                      className="cursor-default"
-                      textValue={value}
-                    >
-                      {value}
-                    </ListboxItem>
-                  ))}
-              </Listbox>
+              {errorResp ? (
+                <div className="flex flex-col items-center w-full rounded-lg bg-danger gap-2 p-6">
+                  <ErrorIcon />
+                  <h2>{errorResp}</h2>
+                  <Code>{response.address}</Code>
+                </div>
+              ) : (
+                <Listbox
+                  variant="flat"
+                  aria-label="List displaying parsed address"
+                  emptyContent={null}
+                >
+                  {Object.entries(response)
+                    .filter(([key, _]) => key !== "@removed")
+                    .map(([key, value], index) => (
+                      <ListboxItem
+                        key={String(index)}
+                        description={key}
+                        className="cursor-default"
+                        textValue={value}
+                      >
+                        {value}
+                      </ListboxItem>
+                    ))}
+                </Listbox>
+              )}
+
               <div
                 className={`flex gap-2 p-2${
                   response["@removed"]?.length === 0 && " hidden"

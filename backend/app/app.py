@@ -129,7 +129,6 @@ class PhoneInput(BaseModel):
         return ErrorPhoneReturn(**self.model_dump())
 
 
-
 class ErrorPhoneReturn(PhoneInput):
     error: str = Field(
         default="Unparseable",
@@ -164,6 +163,14 @@ class PhoneListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
+def check_error(return_dict: dict[str, str | list]) -> bool:
+    """Check if zero or one values are not None."""
+    return_dict.pop("@removed", None)
+    count = sum(1 for value in return_dict.values() if value is not None)
+    print(count)
+    return bool(count)
+
+
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     """Solve and resolve address inputs."""
     try:
@@ -180,7 +187,7 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
         add_return = AddressReturnBase.model_validate(
             cleaned_ret | {"@id": content.oid, "@removed": bad_fields}
         )
-    if any(add_return.model_dump().values()):
+    if not check_error(add_return.model_dump()):
         return content.make_error()
     return add_return
 
