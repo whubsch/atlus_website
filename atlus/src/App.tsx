@@ -237,7 +237,9 @@ function App() {
                 <div className="flex flex-col items-center w-full rounded-lg bg-danger gap-2 p-6">
                   <ErrorIcon />
                   <h2>{errorResp}</h2>
-                  <Code>{response.address}</Code>
+                  <Code>
+                    {response.address ? response.address : response.phone}
+                  </Code>
                 </div>
               ) : (
                 <Listbox

@@ -163,11 +163,13 @@ class PhoneListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
-def check_error(return_dict: dict[str, str | list]) -> bool:
+def check_fields(return_dict: dict[str, str | list]) -> bool:
     """Check if zero or one values are not None."""
-    return_dict.pop("@removed", None)
+    removed_keys = ["removed", "oid"]
+    for remove_key in removed_keys:
+        return_dict.pop(remove_key, None)
     count = sum(1 for value in return_dict.values() if value is not None)
-    return bool(count)
+    return count <= 1
 
 
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
@@ -178,7 +180,7 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
             dict(cleaned) | {"@id": content.oid, "@removed": removed}
         )
     except ValidationError as e:
-        bad_fields: list[str] = [each.get("loc")[0] for each in e.errors()]
+        bad_fields: list = [each.get("loc")[0] for each in e.errors()]
         cleaned_ret = dict(cleaned)
         for each in bad_fields:
             cleaned_ret.pop(each, None)
@@ -186,7 +188,7 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
         add_return = AddressReturnBase.model_validate(
             cleaned_ret | {"@id": content.oid, "@removed": bad_fields}
         )
-    if not check_error(add_return.model_dump()):
+    if check_fields(add_return.model_dump()):
         return content.make_error()
     return add_return
 
