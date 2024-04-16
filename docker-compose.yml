@@ -39,6 +39,7 @@ services:
       - "traefik.http.services.fast.loadbalancer.server.port=5000"
       - "traefik.http.routers.fast.entrypoints=websecure"
       - "traefik.http.routers.fast.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.ratelimit.ratelimit.average=4"
 
   rproxy:
     image: traefik:v3.0

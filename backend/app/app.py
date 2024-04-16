@@ -1,6 +1,5 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationError
 
@@ -42,7 +41,7 @@ class AddressInput(BaseModel):
 class ErrorAddressReturn(AddressInput):
     error: str = Field(
         default="Unparseable",
-        description="The raw address string that needs to be parsed.",
+        description="The error message.",
     )
 
 
@@ -132,7 +131,7 @@ class PhoneInput(BaseModel):
 class ErrorPhoneReturn(PhoneInput):
     error: str = Field(
         default="Unparseable",
-        description="The raw phone string that needs to be parsed.",
+        description="The error message.",
     )
 
 
@@ -195,19 +194,24 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
 
 @router.get("/")
 async def meta() -> ApiMeta:
-    """Return meta information."""
+    """Return meta information. Helpful to check if service is up."""
     return ApiMeta()
 
 
-@router.post("/address/parse/", response_model_exclude_none=True)
+@router.post("/address/parse/", response_model_exclude_none=True, name="address parse")
 async def single(address: AddressInput) -> AddressReturn:
     """Return a single parsed address."""
     return AddressReturn(data=validate(address))
 
 
-@router.post("/address/batch/", response_model_exclude_none=True)
+@router.post("/address/batch/", response_model_exclude_none=True, name="address batch")
 async def batch(addresses: list[AddressInput]) -> AddressListReturn:
-    """Return a batch of parsed addresses."""
+    """Return a batch of parsed addresses. Limit of 10,000 items per request."""
+    if len(addresses) > 10000:
+        raise HTTPException(
+            status_code=400,
+            detail="More than 10,000 items. Submit request in smaller batches.",
+        )
     if len({i.oid for i in addresses}) != len(addresses):
         raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
 
@@ -229,15 +233,20 @@ def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
     return phone.make_error()
 
 
-@router.post("/phone/parse/", response_model_exclude_none=True)
+@router.post("/phone/parse/", response_model_exclude_none=True, name="phone parse")
 async def phone_parse(phone: PhoneInput) -> PhoneReturn:
     """Format US and Canada phone numbers."""
     return PhoneReturn(data=phone_process(phone))
 
 
-@router.post("/phone/batch/", response_model_exclude_none=True)
+@router.post("/phone/batch/", response_model_exclude_none=True, name="phone batch")
 async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
-    """Format US and Canada phone numbers."""
+    """Format US and Canada phone numbers. Limit of 10,000 items per request."""
+    if len(phones) > 10000:
+        raise HTTPException(
+            status_code=400,
+            detail="More than 10,000 items. Submit request in smaller batches.",
+        )
     if len({i.oid for i in phones}) != len(phones):
         raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
 
@@ -245,7 +254,26 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
     return PhoneListReturn(data=cleaned)
 
 
-app = FastAPI()
+desc = """
+Access the powers of Atlus using a public API so that you can automate your workflow and work with bigger datasets quickly.
+
+Follow the clear and auto-generated documentation below to get a consistent and reliable output.
+
+For documentation on the OSM data this application follows, check [the OSM wiki](https://wiki.openstreetmap.org/wiki/Addresses).
+
+I welcome issues and pull requests at the [Atlus Github repository.](https://github.com/whubsch/atlus/)
+"""
+
+app = FastAPI(
+    title="Atlus - API",
+    description=desc,
+    version=version,
+    license_info={
+        "name": "MIT",
+        "identifier": "MIT",
+        "url": "https://github.com/whubsch/atlus/blob/main/LICENSE",
+    },
+)
 
 app.include_router(router=router, prefix="/api")
 
