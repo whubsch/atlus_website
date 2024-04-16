@@ -21,7 +21,7 @@ export default function AtlusNav() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="/docs">
+          <Button as={Link} href="/docs" className="bg-deepindigo">
             Docs
           </Button>
         </NavbarItem>

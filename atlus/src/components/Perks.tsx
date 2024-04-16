@@ -11,7 +11,7 @@ const Perk: React.FC<PerkProps> = ({ icon, title, description }) => {
     <Card className="md:w-1/4 p-4" isHoverable={true}>
       <CardBody className="flex flex-col gap-2 justify-center items-center">
         {icon}
-        <h3 className="text-xl text-center leading-9 font-extrabold capitalize">
+        <h3 className="text-xl text-center font-extrabold capitalize text-deepindigo">
           {title}
         </h3>
         <p>{description}</p>

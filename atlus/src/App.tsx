@@ -167,7 +167,7 @@ function App() {
                       color="primary"
                       size="md"
                       type={inputValue ? "submit" : "button"}
-                      className="h-full w-4 md:w-auto"
+                      className="h-full w-4 md:w-auto bg-deepindigo"
                       onClick={handleClick}
                     >
                       {!inputValue ? (
@@ -192,7 +192,7 @@ function App() {
                   color="primary"
                   size="md"
                   type={inputValue ? "submit" : "button"}
-                  className="h-10 md:h-14 w-full md:w-auto"
+                  className="h-10 md:h-14 w-full md:w-auto bg-deepindigo"
                   onClick={handleClick}
                   aria-label={inputValue ? "Submit" : "Random sample"}
                 >
@@ -226,7 +226,7 @@ function App() {
                 size="sm"
                 onClick={clipboardCopy}
                 endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
-                className="w-1/2"
+                className={`w-1/2 ${!errorResp && "bg-deepindigo"}`}
                 disabled={errorResp}
               >
                 {copied ? "Copied" : "Copy"}
