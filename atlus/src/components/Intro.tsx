@@ -3,8 +3,6 @@ import FactCheckIcon from "@mui/icons-material/FactCheck";
 import ApiIcon from "@mui/icons-material/Api";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
 import { Tab, Tabs } from "@nextui-org/react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { ocean } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 import Perk from "./Perks";
 import React from "react";
@@ -15,7 +13,7 @@ interface SubComponentProps {
 }
 
 const Intro: React.FC<SubComponentProps> = ({ classes }) => {
-  const [selected, setSelected] = React.useState("python");
+  const [selected, setSelected] = React.useState<string | number>("python");
 
   return (
     <div className={`${classes} z-10 justify-center items-center`}>
