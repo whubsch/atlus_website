@@ -20,7 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       } text-foreground bg-background`}
     >
       <Navbar />
-      <App />
+      <App dark={isDarkModeEnabled()} />
     </NextUIProvider>
   </React.StrictMode>
 );

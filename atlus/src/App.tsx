@@ -29,6 +29,10 @@ import Footer from "./components/Footer";
 
 const version = "0.1.0";
 
+interface AppProps {
+  dark: boolean;
+}
+
 interface responseInt {
   "addr:housenumber"?: string;
   "addr:street"?: string;
@@ -47,7 +51,7 @@ interface metaInt {
   status?: string;
 }
 
-function App() {
+const App: React.FC<AppProps> = ({ dark }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [apiMeta, setApiMeta] = useState<metaInt>({});
   const [response, setResponse] = useState<responseInt>({});
@@ -136,7 +140,7 @@ function App() {
   return (
     <>
       <div className="flex flex-col justify-center items-center py-20 px-4 gap-6 sm:py-44">
-        <LogoHeader />
+        <LogoHeader dark={dark} />
         <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
           <Card className="p-4 z-40 rounded-lg">
             <CardBody className="gap-4">
@@ -303,6 +307,6 @@ function App() {
       <Footer version={version} />
     </>
   );
-}
+};
 
 export default App;
