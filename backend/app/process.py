@@ -296,7 +296,7 @@ def process(
             cleaned["addr:state"] = old.upper()
 
     if "addr:unit" in cleaned:
-        cleaned["addr:unit"] = cleaned["addr:unit"].strip(" #.")
+        cleaned["addr:unit"] = cleaned["addr:unit"].removeprefix("Space").strip(" #.")
 
     if "addr:postcode" in cleaned:
         # remove extraneous postcode digits

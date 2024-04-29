@@ -255,9 +255,9 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
 
 
 desc = """
-Access the powers of Atlus using a public API so that you can automate your workflow and work with bigger datasets quickly.
+Access the powers of Atlus using a public API to automate your workflow and work with bigger datasets quickly.
 
-Follow the clear and auto-generated documentation below to get a consistent and reliable output.
+Follow the clear and auto-generated documentation below to get a consistent and reliable output. Note that fields that are not found in the address string are not returned.
 
 For documentation on the OSM data this application follows, check [the OSM wiki](https://wiki.openstreetmap.org/wiki/Addresses).
 
