@@ -278,6 +278,17 @@ def process(
     for toss in toss_tags:
         cleaned.pop(toss, None)
 
+    if "addr:housenumber" in cleaned:
+        suite = regex.match(r"([0-9]+)[- \/]?([a-zA-Z]+)", cleaned["addr:housenumber"])
+        if suite:
+            cleaned["addr:housenumber"] = suite.group(1)
+            if "addr:unit" not in cleaned:
+                cleaned["addr:unit"] = suite.group(2).upper()
+            else:
+                if cleaned["addr:unit"] != suite.group(2).upper():
+                    cleaned.pop("addr:unit")
+                    removed += ["addr:unit"]
+
     if "addr:street" in cleaned:
         street = abbrs(cleaned["addr:street"])
         cleaned["addr:street"] = street_comp.sub(

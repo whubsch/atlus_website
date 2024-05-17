@@ -324,10 +324,13 @@ street_expand = {
     "VLG": "VILLAGE",
     "VL": "VILLE",
     "VIS": "VISTA",
+    "WK": "WALK",
     "WKWY": "WALKWAY",
+    "WY": "WAY",
     "WL": "WELL",
     "WLS": "WELLS",
     "XING": "CROSSING",
+    "XINGS": "CROSSINGS",
     "XRD": "CROSSROAD",
     "XRDS": "CROSSROADS",
 }
