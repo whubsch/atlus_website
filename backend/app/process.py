@@ -53,7 +53,7 @@ def get_title(value: str, single_word: bool = False) -> str:
 
 def us_replace(value: str) -> str:
     """Fix string containing improperly formatted US."""
-    return value.replace("U.S.", "US")
+    return value.replace("U.S.", "US").replace("U. S.", "US").replace("U S ", "US ")
 
 
 def mc_replace(value: str) -> str:
