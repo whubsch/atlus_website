@@ -17,16 +17,11 @@ export default function AtlusNav() {
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
           <Link href="https://github.com/whubsch/atlus">
-            <GitHubIcon />
+            <GitHubIcon className="text-deepindigo" />
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button
-            as={Link}
-            color="primary"
-            href="/docs"
-            className="bg-deepindigo"
-          >
+          <Button as={Link} href="/docs" className="bg-deepindigo">
             Docs
           </Button>
         </NavbarItem>
