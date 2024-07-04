@@ -123,6 +123,16 @@ usa_comp = regex.compile(r",? (?:USA?|United States(?: of America)?|Canada)\b")
 
 paren_comp = regex.compile(r" ?\(.*\)")
 
+# match Wisconsin grid-style addresses: N65w25055, W249 N6620, etc.
+grid_comp = regex.compile(
+    r"\b([NnSs]\d{2,}\s*[EeWw]\d{2,}|[EeWw]\d{2,}\s*[NnSs]\d{2,})\b"
+)
+
+
+def grid_fn(match_str: regex.Match) -> str:
+    """Clean grid addresses."""
+    return match_str.group(0).replace(" ", "").upper()
+
 
 def abbrs(value: str) -> str:
     """Bundle most common abbreviation expansion functions."""
@@ -268,6 +278,7 @@ def process(
     address_string = address_string.replace("  ", " ").strip(" ,.")
     address_string = usa_comp.sub("", address_string)
     address_string = paren_comp.sub("", address_string)
+    address_string = grid_comp.sub(grid_fn, address_string)
     try:
         cleaned = usaddress.tag(clean(address_string), tag_mapping=osm_mapping)[0]
         removed = []
