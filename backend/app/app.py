@@ -1,12 +1,13 @@
+"""App entrypoint."""
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationError
+import atlus
 
-import regex
+from . import VERSION
 
-from app.process import process
-from . import version
 
 router = APIRouter()
 
@@ -14,11 +15,13 @@ router = APIRouter()
 class ApiMeta(BaseModel):
     """Define basic API features."""
 
-    version: str = Field(default=version)
+    version: str = Field(default=VERSION)
     status: str = Field(default="OK")
 
 
 class AddressInput(BaseModel):
+    """Define address parsing input."""
+
     address: str = Field(
         description="The raw address string that needs to be parsed.",
         examples=[
@@ -39,6 +42,8 @@ class AddressInput(BaseModel):
 
 
 class ErrorAddressReturn(AddressInput):
+    """Define address error submodel."""
+
     error: str = Field(
         default="Unparseable",
         description="The error message.",
@@ -99,16 +104,22 @@ class AddressReturnBase(BaseModel):
 
 
 class AddressReturn(BaseModel):
+    """Define address parsing output."""
+
     data: AddressReturnBase | ErrorAddressReturn
     meta: ApiMeta = Field(default=ApiMeta())
 
 
 class AddressListReturn(BaseModel):
+    """Define multiple address parsing output."""
+
     data: list[AddressReturnBase | ErrorAddressReturn]
     meta: ApiMeta = Field(default=ApiMeta())
 
 
 class PhoneInput(BaseModel):
+    """Define phone parsing input."""
+
     phone: str = Field(
         description="The raw phone string that needs to be parsed.",
         examples=[
@@ -129,6 +140,8 @@ class PhoneInput(BaseModel):
 
 
 class ErrorPhoneReturn(PhoneInput):
+    """Define phone error submodel."""
+
     error: str = Field(
         default="Unparseable",
         description="The error message.",
@@ -136,6 +149,8 @@ class ErrorPhoneReturn(PhoneInput):
 
 
 class PhoneReturnBase(BaseModel):
+    """Define phone parsing fields to return."""
+
     phone: str = Field(
         description="The raw phone string that needs to be parsed.",
         examples=[
@@ -153,11 +168,15 @@ class PhoneReturnBase(BaseModel):
 
 
 class PhoneReturn(BaseModel):
+    """Define phone parsing output."""
+
     data: PhoneReturnBase | ErrorPhoneReturn
     meta: ApiMeta = Field(default=ApiMeta())
 
 
 class PhoneListReturn(BaseModel):
+    """Define multiple phone parsing output."""
+
     data: list[PhoneReturnBase | ErrorPhoneReturn]
     meta: ApiMeta = Field(default=ApiMeta())
 
@@ -174,7 +193,7 @@ def check_fields(return_dict: dict[str, str | list]) -> bool:
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     """Solve and resolve address inputs."""
     try:
-        cleaned, removed = process(content.address)
+        cleaned, removed = atlus.get_address(content.address)
         add_return = AddressReturnBase.model_validate(
             dict(cleaned) | {"@id": content.oid, "@removed": removed}
         )
@@ -221,16 +240,11 @@ async def batch(addresses: list[AddressInput]) -> AddressListReturn:
 
 def phone_process(phone: PhoneInput) -> PhoneReturnBase | ErrorPhoneReturn:
     """Help to format."""
-    phone_valid = regex.search(
-        r"^\(?(?:\+? ?1?[ -.]*)?(?:\(?(\d{3})\)?[ -.]*)(\d{3})[ -.]*(\d{4})$",
-        phone.phone,
-    )
-    if phone_valid:
-        phone_new = (
-            f"+1 {phone_valid.group(1)}-{phone_valid.group(2)}-{phone_valid.group(3)}"
-        )
+    try:
+        phone_new = atlus.get_phone(phone.phone)
         return PhoneReturnBase.model_validate({"phone": phone_new, "@id": phone.oid})
-    return phone.make_error()
+    except ValueError:
+        return phone.make_error()
 
 
 @router.post("/phone/parse/", response_model_exclude_none=True, name="phone parse")
@@ -254,7 +268,7 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
     return PhoneListReturn(data=cleaned)
 
 
-desc = """
+DESC = """
 Access the powers of Atlus using a public API to automate your workflow and work with bigger datasets quickly.
 
 Follow the clear and auto-generated documentation below to get a consistent and reliable output. Note that fields that are not found in the address string are not returned.
@@ -266,8 +280,8 @@ I welcome issues and pull requests at the [Atlus Github repository.](https://git
 
 app = FastAPI(
     title="Atlus - API",
-    description=desc,
-    version=version,
+    description=DESC,
+    version=VERSION,
     license_info={
         "name": "MIT",
         "identifier": "MIT",

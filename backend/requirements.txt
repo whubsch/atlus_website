@@ -1,6 +1,7 @@
 annotated-types==0.6.0
 anyio==4.3.0
 astroid==3.1.0
+atlus==0.2.3
 black==24.3.0
 certifi==2024.2.2
 charset-normalizer==3.3.2

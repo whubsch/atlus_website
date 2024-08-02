@@ -1,1 +1,3 @@
-version = "0.2.2"
+"""Backend for the atlus code."""
+
+VERSION = "0.2.3"
