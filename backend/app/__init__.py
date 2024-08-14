@@ -1,3 +1,5 @@
 """Backend for the atlus code."""
 
-VERSION = "0.2.3"
+from importlib.metadata import version
+
+VERSION = version("atlus")

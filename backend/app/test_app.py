@@ -1,6 +1,9 @@
-from fastapi.testclient import TestClient
+"""Test the Atlus API."""
+
 import pytest
-from .app import app
+from fastapi.testclient import TestClient
+
+from .app import VERSION, app
 
 client = TestClient(app=app, root_path="")
 
@@ -32,6 +35,12 @@ test_phones = [
     "1 902 989 2837",
     "9389209876",
 ]
+
+
+def test_get_version() -> None:
+    """Test version endpoint."""
+    response = client.get("/api/")
+    assert response.json()["version"] == VERSION
 
 
 def test_get_main() -> None:

@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "atlus"
+dynamic = ["version"]
+description = 'Translate raw address strings into the OSM tagging scheme.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["osm", "openstreetmap", "mapping", "address", "geocoding"]
+authors = [{ name = "Will", email = "wahubsch@gmail.com" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "License :: OSI Approved :: MIT License",
+    "Typing :: Typed",
+]
+dependencies = [
+    "atlus>=0.2.3",
+    "fastapi>=0.112.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.8.2",
+    "pytest>=8.3.2",
+    "uvicorn>=0.30.6",
+]
+
+[project.urls]
+Source = "https://github.com/whubsch/atlus_website"
+Issues = "https://github.com/whubsch/atlus_website/issues"
+
+[tool.hatch.version]
+path = "backend/appy/__init__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.0.0"]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/atlus_website tests}"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "backend/app",
+]
+
+[tool.coverage.run]
+source_pkgs = ["atlus", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+atlus = ["backend/app", "*/atlus_website/backend/app"]
+tests = ["tests", "*/backend/app"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.ruff]
+fix = true
+
+[tool.ruff.lint]
+select = ["D", "E", "F", "I", "SIM", "UP", "W", "YTT"]
+pydocstyle.convention = "google"
+exclude = ["tests/*", "scripts/*"]
+isort.split-on-trailing-comma = false
+
+[tool.ruff.format]
+docstring-code-format = true
+skip-magic-trailing-comma = true

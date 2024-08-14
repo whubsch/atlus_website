@@ -1,13 +1,12 @@
 """App entrypoint."""
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationError
+
 import atlus
 
 from . import VERSION
-
 
 router = APIRouter()
 
@@ -44,10 +43,7 @@ class AddressInput(BaseModel):
 class ErrorAddressReturn(AddressInput):
     """Define address error submodel."""
 
-    error: str = Field(
-        default="Unparseable",
-        description="The error message.",
-    )
+    error: str = Field(default="Unparseable", description="The error message.")
 
 
 class AddressReturnBase(BaseModel):
@@ -122,11 +118,7 @@ class PhoneInput(BaseModel):
 
     phone: str = Field(
         description="The raw phone string that needs to be parsed.",
-        examples=[
-            "1234567890",
-            "545-098-0988",
-            "+1 (908) 930-3099",
-        ],
+        examples=["1234567890", "545-098-0988", "+1 (908) 930-3099"],
     )
     oid: int | str = Field(
         alias="@id",
@@ -142,10 +134,7 @@ class PhoneInput(BaseModel):
 class ErrorPhoneReturn(PhoneInput):
     """Define phone error submodel."""
 
-    error: str = Field(
-        default="Unparseable",
-        description="The error message.",
-    )
+    error: str = Field(default="Unparseable", description="The error message.")
 
 
 class PhoneReturnBase(BaseModel):
@@ -153,11 +142,7 @@ class PhoneReturnBase(BaseModel):
 
     phone: str = Field(
         description="The raw phone string that needs to be parsed.",
-        examples=[
-            "1234567890",
-            "545-098-0988",
-            "+1 (908) 930-3099",
-        ],
+        examples=["1234567890", "545-098-0988", "+1 (908) 930-3099"],
         pattern=r"^\+1 \d{3}-\d{3}-\d{4}$",
     )
     oid: int | str = Field(
@@ -269,13 +254,18 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
 
 
 DESC = """
-Access the powers of Atlus using a public API to automate your workflow and work with bigger datasets quickly.
+Access the powers of Atlus using a public API to automate your workflow and work
+with bigger datasets quickly.
 
-Follow the clear and auto-generated documentation below to get a consistent and reliable output. Note that fields that are not found in the address string are not returned.
+Follow the clear and auto-generated documentation below to get a consistent and
+reliable output. Note that fields that are not found in the address string are
+not returned.
 
-For documentation on the OSM data this application follows, check [the OSM wiki](https://wiki.openstreetmap.org/wiki/Addresses).
+For documentation on the OSM data this application follows, check
+[the OSM wiki](https://wiki.openstreetmap.org/wiki/Addresses).
 
-I welcome issues and pull requests at the [Atlus Github repository.](https://github.com/whubsch/atlus/)
+I welcome issues and pull requests at the
+[Atlus Github repository.](https://github.com/whubsch/atlus/)
 """
 
 app = FastAPI(
