@@ -5,6 +5,7 @@ import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstruct
 import { Tab, Tabs } from "@nextui-org/react";
 
 import Perk from "./Perks";
+import Pip from "./PipBlock";
 import React from "react";
 import { jsCode, curlCode, pyCode } from "./JsCode";
 import CodeBlock from "./CodeBlock";
@@ -17,6 +18,10 @@ const Intro: React.FC<SubComponentProps> = ({ classes }) => {
 
   return (
     <div className={`${classes} z-10 justify-center items-center`}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 md:w-2/3 p-4 md:p-10">
+        <Pip />
+      </div>
+
       <div className="mx-auto px-4 sm:px-6 lg:px-8 md:w-2/3 p-4 md:p-10">
         <div className="flex max-sm:flex-col sm:flex-wrap max-sm:items-center gap-8">
           <div className="w-4/5 sm:w-2/5">

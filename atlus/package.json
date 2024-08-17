@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/whubsch/atlus",
+  "homepage": "https://github.com/whubsch/atlus_website",
   "keywords": [
     "openstreetmap",
     "address",
@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/whubsch/atlus.git"
+    "url": "https://github.com/whubsch/atlus_website.git"
   },
   "scripts": {
     "dev": "vite",
