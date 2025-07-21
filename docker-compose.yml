@@ -1,67 +1,61 @@
 services:
-  ddns:
-    build:
-      context: ./ddns
+    ddns:
+        build:
+            context: ./ddns
 
-  reactapp:
-    build:
-      context: ./atlus
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.react.rule=(Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)) && !PathRegexp(`/(?:api/?[^.]*|docs|openapi\\.json)$`)"
-      - "traefik.http.routers.react.priority=3"
-      - "traefik.http.services.react.loadbalancer.server.port=80"
-      - "traefik.http.routers.react.entrypoints=websecure"
-      - "traefik.http.routers.react.tls.certresolver=myresolver"
-      - "traefik.http.routers.react.middlewares=stripwww,nonapihome"
+    reactapp:
+        build:
+            context: ./atlus
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.react.rule=(Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)) && !(PathPrefix(`/api`) || Path(`/docs`) || Path(`/openapi.json`))"
+            - "traefik.http.routers.react.priority=3"
+            - "traefik.http.services.react.loadbalancer.server.port=80"
+            - "traefik.http.routers.react.entrypoints=websecure"
+            - "traefik.http.routers.react.tls.certresolver=myresolver"
 
-      # for local development
-      - "traefik.http.routers.react-ip.rule=Host(`192.168.68.62`)"
-      - "traefik.http.routers.react-ip.entrypoints=websecure"
-      - "traefik.http.routers.react-ip.tls.certresolver=myresolver"
-      - "traefik.http.routers.react-ip.service=react"
+            # redirect to https
+            - "traefik.http.middlewares.redirscheme.redirectscheme.scheme=https"
+            - "traefik.http.middlewares.redirscheme.redirectscheme.permanent=true"
 
-      # redirect to https
-      - "traefik.http.middlewares.redirscheme.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirscheme.redirectscheme.permanent=true"
+            # strip `www` from path
+            - "traefik.http.middlewares.stripwww.redirectregex.regex=^(https?://)(?:www\\.)(${DOMAIN}.*)$"
+            - "traefik.http.middlewares.stripwww.redirectregex.replacement=$${1}$${2}"
+            - "traefik.http.middlewares.stripwww.redirectregex.permanent=true"
 
-      # strip `www` from path
-      - "traefik.http.middlewares.stripwww.redirectregex.regex=^(https?://)(?:www\\.)(${DOMAIN}.*)$"
-      - "traefik.http.middlewares.stripwww.redirectregex.replacement=$${1}$${2}"
-      - "traefik.http.middlewares.stripwww.redirectregex.permanent=true"
+            # redirect non-api, non-file URL paths to home (exclude ACME challenge)
+            - "traefik.http.middlewares.nonapihome.redirectregex.regex=^(https?://${DOMAIN}/)(?!\\.well-known/acme-challenge/)[^.]*$"
+            - "traefik.http.middlewares.nonapihome.redirectregex.replacement=$$1"
+            - "traefik.http.middlewares.nonapihome.redirectregex.permanent=true"
 
-      # redirect non-api, non-file URL paths to home
-      - "traefik.http.middlewares.nonapihome.redirectregex.regex=^(https?://${DOMAIN}/)[^.]*$"
-      - "traefik.http.middlewares.nonapihome.redirectregex.replacement=$$1"
-      - "traefik.http.middlewares.nonapihome.redirectregex.permanent=true"
+    fastapiapp:
+        build:
+            context: ./backend
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.fast.rule=(Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)) && (PathPrefix(`/api`) || Path(`/docs`) || Path(`/openapi.json`))"
+            - "traefik.http.routers.fast.priority=5"
+            - "traefik.http.services.fast.loadbalancer.server.port=5000"
+            - "traefik.http.routers.fast.entrypoints=websecure"
+            - "traefik.http.routers.fast.tls.certresolver=myresolver"
+            - "traefik.http.middlewares.ratelimit.ratelimit.average=4"
 
-  fastapiapp:
-    build:
-      context: ./backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fast.rule=(Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)) && PathRegexp(`/(?:api/?[^.]*|docs|openapi\\.json)$`)"
-      - "traefik.http.routers.fast.priority=5"
-      - "traefik.http.services.fast.loadbalancer.server.port=5000"
-      - "traefik.http.routers.fast.entrypoints=websecure"
-      - "traefik.http.routers.fast.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.ratelimit.ratelimit.average=4"
-
-  rproxy:
-    image: traefik:v3.0
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
+    rproxy:
+        image: traefik:v3.0
+        command:
+            - "--log.level=DEBUG"
+            - "--api.insecure=true"
+            - "--providers.docker"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+            - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8080:8080"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./letsencrypt:/letsencrypt"

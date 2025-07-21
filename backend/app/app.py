@@ -196,7 +196,7 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     return add_return
 
 
-@router.get("/")
+@router.get("/meta")
 async def meta() -> ApiMeta:
     """Return meta information. Helpful to check if service is up."""
     return ApiMeta()
