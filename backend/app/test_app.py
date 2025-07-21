@@ -39,7 +39,7 @@ test_phones = [
 
 def test_get_version() -> None:
     """Test version endpoint."""
-    response = client.get("/api/")
+    response = client.get("/api/meta")
     assert response.json()["version"] == VERSION
 
 

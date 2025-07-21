@@ -177,6 +177,7 @@ def check_fields(return_dict: dict[str, str | list]) -> bool:
 
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     """Solve and resolve address inputs."""
+    cleaned = {}
     try:
         cleaned, removed = atlus.get_address(content.address)
         add_return = AddressReturnBase.model_validate(

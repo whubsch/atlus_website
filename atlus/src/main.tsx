@@ -22,5 +22,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Navbar />
       <App dark={isDarkModeEnabled()} />
     </NextUIProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
