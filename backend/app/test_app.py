@@ -45,7 +45,7 @@ def test_get_version() -> None:
 
 def test_get_main() -> None:
     """Test homepage."""
-    response = client.get("/api/")
+    response = client.get("/api/meta")
     assert response.status_code == 200
 
 

@@ -15,8 +15,10 @@ jobs:
                   node-version: "21"
                   cache: "npm"
 
+            - run: cd atlus
+
             - name: Install dependencies
               run: npm ci
 
             - name: Check formatting with Prettier
-              run: npx prettier --check "atlus/**/*.{ts,tsx,js,jsx}"
+              run: npx prettier --check "src/**/*.{ts,tsx,js,jsx}"
