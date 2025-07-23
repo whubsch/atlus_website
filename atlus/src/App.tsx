@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import {
   Button,
@@ -13,7 +13,7 @@ import {
   Chip,
   Tooltip,
   Code,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
@@ -112,12 +112,10 @@ const App: React.FC<AppProps> = ({ dark }) => {
     setInputValue(event.target.value);
   };
 
-  const handleClick = (
-    event:
-      | React.FormEvent<FormEvent>
-      | React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
+  const handleClick = (event: any) => {
+    if (event.preventDefault) {
+      event.preventDefault();
+    }
     if (inputValue.trim() === "") {
       handleRandom();
     } else {
@@ -128,7 +126,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
   const clipboardCopy = () => {
     setCopied(true);
     const text = Object.entries(response)
-      .filter(([key, _]) => key !== "@removed")
+      .filter(([key]) => key !== "@removed")
       .map(([key, value]) => `${key}=${value}`);
     navigator.clipboard.writeText(text.join("\n"));
 
@@ -172,7 +170,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                       size="md"
                       type={inputValue ? "submit" : "button"}
                       className="h-full w-4 md:w-auto bg-deepindigo"
-                      onClick={handleClick}
+                      onPress={handleClick}
                     >
                       {!inputValue ? (
                         <AutoFixHighIcon />
@@ -197,7 +195,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                   size="md"
                   type={inputValue ? "submit" : "button"}
                   className="h-10 md:h-14 w-full md:w-auto bg-deepindigo"
-                  onClick={handleClick}
+                  onPress={handleClick}
                   aria-label={inputValue ? "Submit" : "Random sample"}
                 >
                   {!inputValue ? (
@@ -252,7 +250,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                   emptyContent={null}
                 >
                   {Object.entries(response)
-                    .filter(([key, _]) => key !== "@removed")
+                    .filter(([key]) => key !== "@removed")
                     .map(([key, value], index) => (
                       <ListboxItem
                         key={String(index)}

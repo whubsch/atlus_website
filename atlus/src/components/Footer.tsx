@@ -1,4 +1,4 @@
-import { Link, Divider } from "@nextui-org/react";
+import { Link, Divider } from "@heroui/react";
 
 interface FooterProps {
   version: string;

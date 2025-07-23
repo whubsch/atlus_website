@@ -5,7 +5,7 @@ import {
   NavbarItem,
   Link,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
 export default function AtlusNav() {

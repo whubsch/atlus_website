@@ -1,4 +1,4 @@
-import { Code, Button, Link } from "@nextui-org/react";
+import { Code, Button, Link } from "@heroui/react";
 
 import React from "react";
 

@@ -2,7 +2,7 @@ import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
 import ApiIcon from "@mui/icons-material/Api";
 import IntegrationInstructionsIcon from "@mui/icons-material/IntegrationInstructions";
-import { Tab, Tabs } from "@nextui-org/react";
+import { Tab, Tabs } from "@heroui/react";
 
 import Perk from "./Perks";
 import Pip from "./PipBlock";
