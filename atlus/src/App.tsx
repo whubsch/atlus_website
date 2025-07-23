@@ -60,12 +60,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
   const [errorResp, setErrorResp] = useState<boolean>(false);
 
-  const urlBase = `${
-    window.location.hostname === "localhost" &&
-    window.location.protocol === "http:"
-      ? window.location.protocol + "//localhost:5000"
-      : window.location.origin
-  }/api`;
+  const urlBase = `${window.location.origin}/api`;
 
   const tabs = ["address", "phone"];
   const clearAll = () => {

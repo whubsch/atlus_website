@@ -1,0 +1,35 @@
+name: Prettier check
+
+on:
+    push:
+        paths:
+            - "atlus/**"
+            - ".github/workflows/prettier.yml"
+    pull_request:
+        paths:
+            - "atlus/**"
+            - ".github/workflows/prettier.yml"
+    workflow_dispatch:
+
+jobs:
+    prettier-check:
+        name: Check code formatting
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./atlus
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "21"
+                  cache: "npm"
+                  cache-dependency-path: "./atlus/package-lock.json"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Check formatting with Prettier
+              run: npx prettier --check "src/**/*.{ts,tsx,js,jsx}"

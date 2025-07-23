@@ -177,6 +177,7 @@ def check_fields(return_dict: dict[str, str | list]) -> bool:
 
 def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     """Solve and resolve address inputs."""
+    cleaned = {}
     try:
         cleaned, removed = atlus.get_address(content.address)
         add_return = AddressReturnBase.model_validate(
@@ -196,7 +197,7 @@ def validate(content: AddressInput) -> AddressReturnBase | ErrorAddressReturn:
     return add_return
 
 
-@router.get("/")
+@router.get("/meta")
 async def meta() -> ApiMeta:
     """Return meta information. Helpful to check if service is up."""
     return ApiMeta()
