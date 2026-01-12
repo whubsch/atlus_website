@@ -30,6 +30,7 @@
     "@heroui/react": "2.8.1",
     "@heroui/theme": "^2.4.19",
     "@mui/icons-material": "^5.15.14",
+    "@tailwindcss/vite": "^4.1.18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "framer-motion": "^11.0.12",
     "react": "^18.2.0",
@@ -48,8 +49,8 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.17",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.2.2",
-    "vite": "^7.2.2"
+    "vite": "^7.3.1"
   }
 }

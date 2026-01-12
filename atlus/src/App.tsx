@@ -213,7 +213,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
               <Button
                 color="default"
                 size="sm"
-                onClick={clearAll}
+                onPress={clearAll}
                 className="w-1/2"
               >
                 Clear
@@ -221,7 +221,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
               <Button
                 color={errorResp ? "danger" : "primary"}
                 size="sm"
-                onClick={clipboardCopy}
+                onPress={clipboardCopy}
                 endContent={copied ? <CheckIcon /> : <CopyAllIcon />}
                 className={`w-1/2 ${!errorResp && "bg-deepindigo"}`}
                 disabled={errorResp}
