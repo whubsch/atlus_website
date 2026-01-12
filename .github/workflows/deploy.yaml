@@ -9,6 +9,11 @@ on:
       - "atlus/src/**/*.js"
       - "atlus/src/**/*.jsx"
       - "atlus/src/**/*.css"
+      - "atlus/*.ts"
+      - "atlus/*.tsx"
+      - "atlus/*.js"
+      - "atlus/*.jsx"
+      - "atlus/*.css"
       - ".github/workflows/deploy.yaml"
   workflow_dispatch:
 
