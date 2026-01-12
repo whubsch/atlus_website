@@ -290,6 +290,8 @@ origins = [
     "http://localhost",
     "localhost",
     "http://localhost:5173",
+    "https://cibzhvfi41.execute-api.us-east-1.amazonaws.com",
+    "atlus.dev",
 ]
 
 

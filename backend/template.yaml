@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Atlus API - FastAPI application on AWS Lambda
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        PYTHONPATH: /var/task
+
+Parameters:
+  StageName:
+    Type: String
+    Default: prod
+    Description: API Gateway stage name
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+Resources:
+  AtlusApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub atlus-api-${StageName}
+      CodeUri: .
+      Handler: lambda_handler.handler
+      Description: Atlus API - Address and phone parsing service
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          STAGE: !Ref StageName
+      Events:
+        ApiRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AtlusApiGateway
+            Path: /
+            Method: ANY
+        ApiProxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AtlusApiGateway
+            Path: /{proxy+}
+            Method: ANY
+
+  AtlusApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub atlus-api-${StageName}
+      StageName: !Ref StageName
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+        AllowCredentials: false
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${AtlusApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Export:
+      Name: !Sub atlus-api-url-${StageName}
+
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt AtlusApiFunction.Arn

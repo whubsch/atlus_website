@@ -60,7 +60,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
   const [errorResp, setErrorResp] = useState<boolean>(false);
 
-  const urlBase = `${window.location.origin}/api`;
+  const urlBase = `https://cibzhvfi41.execute-api.us-east-1.amazonaws.com/prod/api`;
 
   const tabs = ["address", "phone"];
   const clearAll = () => {

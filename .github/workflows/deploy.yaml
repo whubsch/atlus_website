@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "atlus/src/**/*.ts"
+      - "atlus/src/**/*.tsx"
+      - "atlus/src/**/*.js"
+      - "atlus/src/**/*.jsx"
+      - "atlus/src/**/*.css"
+      - ".github/workflows/deploy.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "21"
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./atlus
+
+      - name: Build
+        run: npm run build
+        working-directory: ./atlus
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./atlus/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
