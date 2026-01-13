@@ -21,7 +21,11 @@ export default function AtlusNav() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} href="/docs" className="bg-deepindigo">
+          <Button
+            as={Link}
+            href="https://cibzhvfi41.execute-api.us-east-1.amazonaws.com/prod/docs"
+            className="bg-deepindigo"
+          >
             Docs
           </Button>
         </NavbarItem>
