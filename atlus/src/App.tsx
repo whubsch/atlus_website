@@ -107,10 +107,16 @@ const App: React.FC<AppProps> = ({ dark }) => {
     setInputValue(event.target.value);
   };
 
-  const handleClick = (event: any) => {
-    if (event.preventDefault) {
-      event.preventDefault();
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (inputValue.trim() === "") {
+      handleRandom();
+    } else {
+      handleSubmit();
     }
+  };
+
+  const handleClick = () => {
     if (inputValue.trim() === "") {
       handleRandom();
     } else {
@@ -151,7 +157,10 @@ const App: React.FC<AppProps> = ({ dark }) => {
                   />
                 ))}
               </Tabs>
-              <form className="flex flex-wrap max-md:hidden md:flex-nowrap gap-2">
+              <form
+                className="flex flex-wrap max-md:hidden md:flex-nowrap gap-2"
+                onSubmit={handleFormSubmit}
+              >
                 {/* large screen, button inside */}
                 <Input
                   type="text"
@@ -163,7 +172,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                     <Button
                       color="primary"
                       size="md"
-                      type={inputValue ? "submit" : "button"}
+                      type="button"
                       className="h-full w-4 md:w-auto bg-deepindigo"
                       onPress={handleClick}
                     >
@@ -176,7 +185,10 @@ const App: React.FC<AppProps> = ({ dark }) => {
                   }
                 />
               </form>
-              <form className="flex flex-wrap gap-2 md:hidden">
+              <form
+                className="flex flex-wrap gap-2 md:hidden"
+                onSubmit={handleFormSubmit}
+              >
                 {/* small screen, button below */}
                 <Input
                   type="text"
@@ -188,7 +200,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                 <Button
                   color="primary"
                   size="md"
-                  type={inputValue ? "submit" : "button"}
+                  type="button"
                   className="h-10 md:h-14 w-full md:w-auto bg-deepindigo"
                   onPress={handleClick}
                   aria-label={inputValue ? "Submit" : "Random sample"}
