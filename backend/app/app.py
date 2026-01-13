@@ -143,7 +143,7 @@ class PhoneReturnBase(BaseModel):
     phone: str = Field(
         description="The raw phone string that needs to be parsed.",
         examples=["1234567890", "545-098-0988", "+1 (908) 930-3099"],
-        pattern=r"^\+1 \d{3}-\d{3}-\d{4}$",
+        pattern=r"^\+1-\d{3}-\d{3}-\d{4}$",
     )
     oid: int | str = Field(
         alias="@id",
@@ -286,23 +286,11 @@ app = FastAPI(
 
 app.include_router(router=router, prefix="/api")
 
-origins = [
-    "http://localhost:5000",
-    "localhost:5000",
-    "http://127.0.0.1:5000",
-    "127.0.0.1:5000",
-    "http://localhost",
-    "localhost",
-    "http://localhost:5173",
-    "https://cibzhvfi41.execute-api.us-east-1.amazonaws.com",
-    "atlus.dev",
-    "https://whubsch.github.io",
-]
-
-
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
