@@ -278,6 +278,10 @@ app = FastAPI(
         "identifier": "MIT",
         "url": "https://github.com/whubsch/atlus/blob/main/LICENSE",
     },
+    root_path="/prod",  # API Gateway stage prefix for proper OpenAPI docs
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
 )
 
 app.include_router(router=router, prefix="/api")
@@ -292,6 +296,7 @@ origins = [
     "http://localhost:5173",
     "https://cibzhvfi41.execute-api.us-east-1.amazonaws.com",
     "atlus.dev",
+    "https://whubsch.github.io",
 ]
 
 
