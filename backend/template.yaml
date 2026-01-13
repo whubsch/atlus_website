@@ -23,6 +23,19 @@ Parameters:
       - staging
       - prod
 
+  CustomDomainName:
+    Type: String
+    Default: ""
+    Description: Custom domain name for the API (e.g., api.atlus.dev). Leave empty to skip custom domain setup.
+
+  CertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM certificate ARN for the custom domain (must be in us-east-1). Leave empty to skip custom domain setup.
+
+Conditions:
+  UseCustomDomain: !Not [!Equals [!Ref CustomDomainName, ""]]
+
 Resources:
   AtlusApiFunction:
     Type: AWS::Serverless::Function
@@ -61,12 +74,40 @@ Resources:
         AllowOrigin: "'*'"
         AllowCredentials: false
 
+  ApiCustomDomain:
+    Type: AWS::ApiGateway::DomainName
+    Condition: UseCustomDomain
+    Properties:
+      DomainName: !Ref CustomDomainName
+      CertificateArn: !Ref CertificateArn
+      SecurityPolicy: TLS_1_2
+
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Condition: UseCustomDomain
+    Properties:
+      DomainName: !Ref CustomDomainName
+      RestApiId: !Ref AtlusApiGateway
+      Stage: !Ref StageName
+    DependsOn:
+      - ApiCustomDomain
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
     Value: !Sub "https://${AtlusApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
     Export:
       Name: !Sub atlus-api-url-${StageName}
+
+  CustomDomainUrl:
+    Description: Custom domain URL (if configured)
+    Condition: UseCustomDomain
+    Value: !Sub "https://${CustomDomainName}/"
+
+  DistributionDomainName:
+    Description: CloudFront distribution domain name for custom domain DNS setup
+    Condition: UseCustomDomain
+    Value: !GetAtt ApiCustomDomain.DistributionDomainName
 
   FunctionArn:
     Description: Lambda Function ARN
