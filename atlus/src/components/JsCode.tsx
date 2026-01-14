@@ -1,14 +1,14 @@
 export const pyCode = `import requests
 
 add_dict = {"address": "1600 Pennsylvania Ave. NW"}
-API_URL = "https://atlus.dev/api/address/parse"
+API_URL = "https://api.atlus.dev/address/parse"
 response = requests.post(
   API_URL,
   json=add_dict,
   timeout=10
 )`;
 
-export const jsCode = `const url = "https://atlus.dev/api/address/parse";
+export const jsCode = `const url = "https://api.atlus.dev/address/parse";
 const addInput = "1600 Pennsylvania Ave. NW";
 const myResponse = await fetch(url, {
   method: "POST",
@@ -21,7 +21,7 @@ const myResponse = await fetch(url, {
 });`;
 
 export const curlCode = `curl -X POST \\
-  https://atlus.dev/api/address/parse/ \\
+  https://api.atlus.dev/address/parse/ \\
   -H 'accept: application/json' \\
   -H 'Content-Type: application/json' \\
   -d '{
