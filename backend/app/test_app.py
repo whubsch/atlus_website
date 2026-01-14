@@ -39,27 +39,27 @@ test_phones = [
 
 def test_get_version() -> None:
     """Test version endpoint."""
-    response = client.get("/api/meta")
+    response = client.get("/meta")
     assert response.json()["version"] == VERSION
 
 
 def test_get_main() -> None:
     """Test homepage."""
-    response = client.get("/api/meta")
+    response = client.get("/meta")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("add", test_adds)
 def test_post_add_parse(add: str) -> None:
     """Test single address endpoint."""
-    response = client.post("/api/address/parse/", json={"address": add})
+    response = client.post("/address/parse/", json={"address": add})
     assert response.status_code == 200
 
 
 def test_post_add_batch() -> None:
     """Test batch addresses endpoint."""
     response = client.post(
-        "/api/address/batch/",
+        "/address/batch/",
         json=[{"address": each, "@id": oid} for oid, each in enumerate(test_adds)],
     )
 
@@ -69,14 +69,14 @@ def test_post_add_batch() -> None:
 @pytest.mark.parametrize("phone", test_phones)
 def test_post_phone_parse(phone: str) -> None:
     """Test single phone endpoint."""
-    response = client.post("/api/phone/parse/", json={"phone": phone})
+    response = client.post("/phone/parse/", json={"phone": phone})
     assert response.status_code == 200
 
 
 def test_post_phone_batch() -> None:
     """Test batch phones endpoint."""
     response = client.post(
-        "/api/phone/batch/",
+        "/phone/batch/",
         json=[{"phone": each, "@id": oid} for oid, each in enumerate(test_phones)],
     )
 
