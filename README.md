@@ -7,8 +7,8 @@ This project is a web application that allows users to input US address strings 
 - **Address Parsing:** Enter a US address, and the application will convert it into OpenStreetMap format.
 - **FastAPI Backend:** The backend handles the address parsing logic and provides an API endpoint for the frontend and power users.
 - **React Frontend:** A user-friendly interface for entering addresses and viewing the parsed results.
-- **Traefik Reverse Proxy:** A Traefik reverse proxy efficiently routes incoming web traffic to the front- and backend.
-- **Fully Dockerized:** Deploy the application on your own with Docker.
+- **Cloud Infrastructure:** Deployed on AWS Lambda with API Gateway and CloudFront CDN for reliable, scalable performance.
+- **GitHub Pages:** Frontend hosted on GitHub Pages for fast, global content delivery.
 
 ## Usage
 
@@ -20,8 +20,8 @@ This project is a web application that allows users to input US address strings 
 
 ### API
 
-1. Read [the documentation](https://atlus.dev/docs).
-2. Submit post requests to the API path: [atlus.dev/api](https://atlus.dev/api).
+1. Read [the documentation](https://api.atlus.dev/docs).
+2. Submit post requests to the API path: `api.atlus.dev/`.
 3. Abusing the API will result in bans.
 
 ## Contributing
