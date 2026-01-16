@@ -15,7 +15,7 @@ export default function AtlusNav() {
         <p className="font-bold text-inherit headline">Atlus</p>
       </NavbarBrand>
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
+        <NavbarItem>
           <Link href="https://github.com/whubsch/atlus">
             <GitHubIcon className="text-deepindigo" />
           </Link>
@@ -24,7 +24,7 @@ export default function AtlusNav() {
           <Button
             as={Link}
             href="https://cibzhvfi41.execute-api.us-east-1.amazonaws.com/prod/docs"
-            className="bg-deepindigo"
+            className="bg-deepindigo text-white"
           >
             Docs
           </Button>

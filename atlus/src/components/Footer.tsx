@@ -19,7 +19,7 @@ const Footer: React.FC<FooterProps> = ({ version }) => {
       <Divider />
       <div className="flex justify-between items-center p-4 md:p-6">
         <p>© {new Date().getFullYear()} Atlus.</p>
-        <div className="md:flex gap-2">
+        <div className="flex gap-2">
           {externalLinks.map((link, index) => (
             <Link
               key={index}

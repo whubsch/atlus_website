@@ -142,7 +142,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
     <>
       <div className="flex flex-col justify-center items-center py-20 px-4 gap-6 sm:py-44">
         <LogoHeader dark={dark} />
-        <div className="relative w-1/2 min-w-full md:min-w-80 md:max-w-1/3 block">
+        <div className="relative w-1/2 min-w-full md:min-w-80 block">
           <Card className="p-4 z-40 rounded-lg">
             <CardBody className="gap-4">
               <Tabs
