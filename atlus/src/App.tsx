@@ -3,6 +3,7 @@ import "./App.css";
 import {
   Button,
   Input,
+  Textarea,
   Card,
   CardBody,
   Spinner,
@@ -112,7 +113,9 @@ const App: React.FC<AppProps> = ({ dark }) => {
     }
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setInputValue(event.target.value);
   };
 
@@ -170,19 +173,21 @@ const App: React.FC<AppProps> = ({ dark }) => {
                 className="flex flex-wrap max-md:hidden md:flex-nowrap gap-2"
                 onSubmit={handleFormSubmit}
               >
-                {/* large screen, button inside */}
-                <Input
-                  type="text"
-                  size="md"
-                  label="Input"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  endContent={
+                {/* large screen, button inside (or below, for textarea) */}
+                {selectedTab === "hours" ? (
+                  <div className="flex flex-col gap-2 w-full">
+                    <Textarea
+                      size="md"
+                      label="Input"
+                      minRows={1}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                    />
                     <Button
                       color="primary"
-                      size="md"
+                      size="sm"
                       type="button"
-                      className="h-full w-4 md:w-auto bg-deepindigo"
+                      className="w-full md:w-auto bg-deepindigo"
                       onPress={handleClick}
                     >
                       {!inputValue ? (
@@ -191,26 +196,62 @@ const App: React.FC<AppProps> = ({ dark }) => {
                         <>{!loading ? "Submit" : <Spinner color="default" />}</>
                       )}
                     </Button>
-                  }
-                />
+                  </div>
+                ) : (
+                  <Input
+                    type="text"
+                    size="md"
+                    label="Input"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    endContent={
+                      <Button
+                        color="primary"
+                        size="md"
+                        type="button"
+                        className="h-full w-4 md:w-auto bg-deepindigo"
+                        onPress={handleClick}
+                      >
+                        {!inputValue ? (
+                          <AutoFixHighIcon />
+                        ) : (
+                          <>
+                            {!loading ? "Submit" : <Spinner color="default" />}
+                          </>
+                        )}
+                      </Button>
+                    }
+                  />
+                )}
               </form>
               <form
                 className="flex flex-wrap gap-2 md:hidden"
                 onSubmit={handleFormSubmit}
               >
                 {/* small screen, button below */}
-                <Input
-                  type="text"
-                  size="md"
-                  label="Input"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                />
+                {selectedTab === "hours" ? (
+                  <Textarea
+                    size="md"
+                    label="Input"
+                    minRows={1}
+                    maxRows={5}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  <Input
+                    type="text"
+                    size="md"
+                    label="Input"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                  />
+                )}
                 <Button
                   color="primary"
-                  size="md"
+                  // size="sm"
                   type="button"
-                  className="h-10 md:h-14 w-full md:w-auto bg-deepindigo"
+                  className="w-full md:w-auto bg-deepindigo"
                   onPress={handleClick}
                   aria-label={inputValue ? "Submit" : "Random sample"}
                 >
