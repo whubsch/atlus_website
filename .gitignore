@@ -42,6 +42,7 @@ build/
 # Ignore dependencies
 node_modules/
 *.lock
+!uv.lock
 *.log
 
 # Ignore environment configuration

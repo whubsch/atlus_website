@@ -36,6 +36,15 @@ test_phones = [
     "9389209876",
 ]
 
+test_hours = [
+    "Mo-Fr 08:00-12:00,13:00-17:30",
+    "Monday to Friday 9am-5pm, Saturday 9am-12pm",
+    "Closed",
+    "24 hours",
+    "Mon-Sun 9-5",
+    "Weekdays 8am-6pm",
+]
+
 
 def test_get_version() -> None:
     """Test version endpoint."""
@@ -78,6 +87,23 @@ def test_post_phone_batch() -> None:
     response = client.post(
         "/phone/batch/",
         json=[{"phone": each, "@id": oid} for oid, each in enumerate(test_phones)],
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("hours", test_hours)
+def test_post_hours_parse(hours: str) -> None:
+    """Test single hours endpoint."""
+    response = client.post("/hours/parse/", json={"hours": hours})
+    assert response.status_code == 200
+
+
+def test_post_hours_batch() -> None:
+    """Test batch hours endpoint."""
+    response = client.post(
+        "/hours/batch/",
+        json=[{"hours": each, "@id": oid} for oid, each in enumerate(test_hours)],
     )
 
     assert response.status_code == 200

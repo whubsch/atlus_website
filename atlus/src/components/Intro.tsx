@@ -35,8 +35,8 @@ const Intro: React.FC<SubComponentProps> = ({ classes }) => {
             <p>
               Struggling to accurately parse tags from external datasets for
               your mapping projects? Look no further! Atlus is your all-in-one
-              solution to effortlessly parsing raw address and phone strings
-              into OpenStreetMap-compatible tags.
+              solution to effortlessly parsing raw address, phone, and opening
+              hours strings into OpenStreetMap-compatible tags.
             </p>
           </div>
           <div className="w-4/5 sm:w-1/2 min-h-96">

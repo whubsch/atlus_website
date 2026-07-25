@@ -25,3 +25,12 @@ export const phone_strs = [
   "1 902 989 2837",
   "9389209876",
 ];
+
+export const hours_strs = [
+  "Mo-Fr 08:00-12:00,13:00-17:30",
+  "Monday to Friday 9am-5pm, Saturday 9am-12pm",
+  "Closed",
+  "24 hours",
+  "Mon-Sun 9-5",
+  "Weekdays 8am-6pm",
+];

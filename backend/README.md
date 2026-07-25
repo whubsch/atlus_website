@@ -8,10 +8,10 @@ FastAPI application deployed to AWS Lambda with API Gateway and custom domain.
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Run locally
-python lambda_handler.py
+uv run python lambda_handler.py
 
 # API will be available at http://localhost:8000
 # Docs at http://localhost:8000/docs
@@ -21,7 +21,7 @@ python lambda_handler.py
 
 ```bash
 # Run tests
-python -m pytest
+uv run pytest
 
 # Test specific endpoint locally
 curl http://localhost:8000/meta
@@ -80,6 +80,8 @@ Alternatively, use the legacy deploy script (no custom domain parameters):
 - `POST /address/batch/` - Parse batch of addresses (max 10,000)
 - `POST /phone/parse/` - Parse single phone number
 - `POST /phone/batch/` - Parse batch of phone numbers (max 10,000)
+- `POST /hours/parse/` - Parse single opening hours string
+- `POST /hours/batch/` - Parse batch of opening hours strings (max 10,000)
 
 ## Common Tasks
 
@@ -107,12 +109,25 @@ curl -X POST https://api.atlus.dev/address/parse/ \
 
 ### Updating Dependencies
 
-```bash
-# Update requirements.txt
-pip install <package>
-pip freeze > requirements.txt
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) via `pyproject.toml` and the workspace `uv.lock` at the repo root.
 
-# Deploy updated dependencies
+```bash
+# Add/update a dependency
+uv add <package>
+
+# Re-lock without adding anything (e.g. after editing pyproject.toml by hand)
+uv lock
+```
+
+`requirements.txt` is a generated artifact used only for the Lambda build (AWS SAM's default Python builder installs from it). It's regenerated automatically by `deploy.sh` via `uv export`, so you shouldn't need to edit it by hand. To regenerate it manually:
+
+```bash
+uv export --no-hashes --no-dev --no-editable -o requirements.txt
+```
+
+Then deploy as usual:
+
+```bash
 sam build
 sam deploy --stack-name atlus-api-prod --resolve-s3
 ```
@@ -133,10 +148,10 @@ Edit `template.yaml` under the Lambda function's `Environment.Variables` section
 
 ### DNS Records (Namecheap)
 
-| Type | Host | Value |
-|------|------|-------|
-| CNAME | api | `d3te59a4ae6p88.cloudfront.net` |
-| CNAME | _validation | ACM validation record |
+| Type  | Host        | Value                           |
+| ----- | ----------- | ------------------------------- |
+| CNAME | api         | `d3te59a4ae6p88.cloudfront.net` |
+| CNAME | _validation | ACM validation record           |
 
 ### Certificate
 

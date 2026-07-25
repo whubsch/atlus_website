@@ -166,6 +166,62 @@ class PhoneListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
+class HoursInput(BaseModel):
+    """Define opening hours parsing input."""
+
+    hours: str = Field(
+        description="The raw opening hours string that needs to be parsed.",
+        examples=[
+            "Mo-Fr 08:00-12:00,13:00-17:30",
+            "Monday to Friday 9am-5pm, Saturday 9am-12pm",
+            "Closed",
+        ],
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with outputs.",
+        default=0,
+    )
+
+    def make_error(self):
+        """Convert to error submodel."""
+        return ErrorHoursReturn(**self.model_dump())
+
+
+class ErrorHoursReturn(HoursInput):
+    """Define opening hours error submodel."""
+
+    error: str = Field(default="Unparseable", description="The error message.")
+
+
+class HoursReturnBase(BaseModel):
+    """Define opening hours parsing fields to return."""
+
+    opening_hours: str = Field(
+        description="The formatted opening hours string.",
+        examples=["Mo-Fr 08:00-12:00,13:00-17:30", "off", "24/7"],
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with outputs.",
+        default=0,
+    )
+
+
+class HoursReturn(BaseModel):
+    """Define opening hours parsing output."""
+
+    data: HoursReturnBase | ErrorHoursReturn
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
+class HoursListReturn(BaseModel):
+    """Define multiple opening hours parsing output."""
+
+    data: list[HoursReturnBase | ErrorHoursReturn]
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
 def check_fields(return_dict: dict[str, str | list]) -> bool:
     """Check if zero or one values are not None."""
     removed_keys = ["removed", "oid"]
@@ -252,6 +308,38 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
 
     cleaned = [phone_process(phone) for phone in phones]
     return PhoneListReturn(data=cleaned)
+
+
+def hours_process(hours: HoursInput) -> HoursReturnBase | ErrorHoursReturn:
+    """Help to format."""
+    try:
+        hours_new = atlus.get_hours(hours.hours)
+        return HoursReturnBase.model_validate(
+            {"opening_hours": hours_new, "@id": hours.oid}
+        )
+    except ValueError:
+        return hours.make_error()
+
+
+@router.post("/hours/parse/", response_model_exclude_none=True, name="hours parse")
+async def hours_parse(hours: HoursInput) -> HoursReturn:
+    """Format raw opening hours strings into the OSM opening_hours format."""
+    return HoursReturn(data=hours_process(hours))
+
+
+@router.post("/hours/batch/", response_model_exclude_none=True, name="hours batch")
+async def hours_batch(hours: list[HoursInput]) -> HoursListReturn:
+    """Format raw opening hours strings. Limit of 10,000 items per request."""
+    if len(hours) > 10000:
+        raise HTTPException(
+            status_code=400,
+            detail="More than 10,000 items. Submit request in smaller batches.",
+        )
+    if len({i.oid for i in hours}) != len(hours):
+        raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
+
+    cleaned = [hours_process(each) for each in hours]
+    return HoursListReturn(data=cleaned)
 
 
 DESC = """

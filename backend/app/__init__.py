@@ -1,5 +1,8 @@
 """Backend for the atlus code."""
 
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
-VERSION = version("atlus")
+try:
+    VERSION = version("atlus")
+except PackageNotFoundError:
+    VERSION = "unknown"

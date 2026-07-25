@@ -24,7 +24,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 import Intro from "./components/Intro";
 import LogoHeader from "./components/LogoHeader";
-import { addr_strs, phone_strs } from "./statics";
+import { addr_strs, phone_strs, hours_strs } from "./statics";
 import Footer from "./components/Footer";
 
 const version = "0.1.0";
@@ -41,8 +41,10 @@ interface responseInt {
   "addr:postcode"?: string;
   "addr:state"?: string;
   phone?: string;
+  opening_hours?: string;
   "@removed"?: string[];
   address?: string;
+  hours?: string;
   error?: string;
 }
 
@@ -64,7 +66,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
     import.meta.env.VITE_API_URL ||
     `https://cibzhvfi41.execute-api.us-east-1.amazonaws.com/prod/api`;
 
-  const tabs = ["address", "phone"];
+  const tabs = ["address", "phone", "hours"];
   const clearAll = () => {
     setInputValue("");
     setResponse({});
@@ -73,7 +75,12 @@ const App: React.FC<AppProps> = ({ dark }) => {
   };
 
   const handleRandom = () => {
-    const use_strs = selectedTab === "address" ? addr_strs : phone_strs;
+    const use_strs =
+      selectedTab === "address"
+        ? addr_strs
+        : selectedTab === "phone"
+          ? phone_strs
+          : hours_strs;
     const randomIndex = Math.floor(Math.random() * use_strs.length);
     setInputValue(use_strs[randomIndex]);
   };
@@ -249,7 +256,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
                   <ErrorIcon />
                   <h2>{errorResp}</h2>
                   <Code>
-                    {response.address ? response.address : response.phone}
+                    {response.address || response.phone || response.hours}
                   </Code>
                 </div>
               ) : (
