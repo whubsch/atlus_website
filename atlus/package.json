@@ -10,7 +10,8 @@
     "address",
     "parse",
     "tags",
-    "phone"
+    "phone",
+    "opening_hours"
   ],
   "repository": {
     "type": "git",

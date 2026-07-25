@@ -107,3 +107,20 @@ def test_post_hours_batch() -> None:
     )
 
     assert response.status_code == 200
+
+
+def test_post_hours_parse_unparseable_includes_reason() -> None:
+    """Unparseable hours should surface the underlying reason, not a generic message."""
+    response = client.post("/hours/parse/", json={"hours": "asdkfj asdkfj"})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["error"] != "Unparseable"
+    assert "rule" in data["error"].lower()
+
+
+def test_post_hours_parse_empty_string_error() -> None:
+    """An empty hours string should report why it failed."""
+    response = client.post("/hours/parse/", json={"hours": ""})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["error"] == "Empty opening hours string."

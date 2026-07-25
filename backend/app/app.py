@@ -3,6 +3,7 @@
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ValidationError
+from pydantic_core import ErrorDetails
 
 import atlus
 
@@ -183,8 +184,10 @@ class HoursInput(BaseModel):
         default=0,
     )
 
-    def make_error(self):
+    def make_error(self, message: str | None = None):
         """Convert to error submodel."""
+        if message:
+            return ErrorHoursReturn(**self.model_dump(), error=message)
         return ErrorHoursReturn(**self.model_dump())
 
 
@@ -310,6 +313,25 @@ async def phone_batch(phones: list[PhoneInput]) -> PhoneListReturn:
     return PhoneListReturn(data=cleaned)
 
 
+def _describe_hours_error(exc: ValueError) -> str:
+    """Turn an atlus/pydantic exception into a readable error message.
+
+    atlus.get_hours raises either a plain ValueError with a human-readable
+    message, or lets a pydantic ValidationError bubble up (which is itself a
+    ValueError subclass) when the parsed rules fail model validation. This
+    normalizes both into a single, concise, user-facing string.
+    """
+    if isinstance(exc, ValidationError):
+        details: list[ErrorDetails] = exc.errors()
+        messages = []
+        for detail in details:
+            loc = ".".join(str(part) for part in detail["loc"])
+            msg = detail["msg"].removeprefix("Value error, ")
+            messages.append(f"{loc}: {msg}" if loc else msg)
+        return "; ".join(messages) if messages else str(exc)
+    return str(exc)
+
+
 def hours_process(hours: HoursInput) -> HoursReturnBase | ErrorHoursReturn:
     """Help to format."""
     try:
@@ -317,8 +339,8 @@ def hours_process(hours: HoursInput) -> HoursReturnBase | ErrorHoursReturn:
         return HoursReturnBase.model_validate(
             {"opening_hours": hours_new, "@id": hours.oid}
         )
-    except ValueError:
-        return hours.make_error()
+    except ValueError as e:
+        return hours.make_error(_describe_hours_error(e))
 
 
 @router.post("/hours/parse/", response_model_exclude_none=True, name="hours parse")
