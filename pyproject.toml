@@ -26,7 +26,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "atlus==1.1.0b1",
+    "atlus==1.1.0b2",
     "fastapi>=0.112.0",
     "httpx>=0.27.0",
     "pydantic>=2.8.2",
