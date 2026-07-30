@@ -225,6 +225,64 @@ class HoursListReturn(BaseModel):
     meta: ApiMeta = Field(default=ApiMeta())
 
 
+class TimesInput(BaseModel):
+    """Define point-in-time parsing input."""
+
+    times: str = Field(
+        description="The raw point-in-time string that needs to be parsed"
+        " (e.g. `collection_times`, `service_times`).",
+        examples=[
+            "Mo-Fr 15:00,18:00,19:00,23:00; Sa 15:00; Su 10:30,23:00",
+            "Monday to Friday 3pm and 6pm",
+        ],
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with outputs.",
+        default=0,
+    )
+
+    def make_error(self, message: str | None = None):
+        """Convert to error submodel."""
+        if message:
+            return ErrorTimesReturn(**self.model_dump(), error=message)
+        return ErrorTimesReturn(**self.model_dump())
+
+
+class ErrorTimesReturn(TimesInput):
+    """Define point-in-time error submodel."""
+
+    error: str = Field(default="Unparseable", description="The error message.")
+
+
+class TimesReturnBase(BaseModel):
+    """Define point-in-time parsing fields to return."""
+
+    times: str = Field(
+        description="The formatted point-in-time string.",
+        examples=["Mo-Fr 15:00,18:00,19:00,23:00; Sa 15:00; Su 10:30,23:00"],
+    )
+    oid: int | str = Field(
+        alias="@id",
+        description="Unique identifier to help match with inputs.",
+        default=0,
+    )
+
+
+class TimesReturn(BaseModel):
+    """Define point-in-time parsing output."""
+
+    data: TimesReturnBase | ErrorTimesReturn
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
+class TimesListReturn(BaseModel):
+    """Define multiple point-in-time parsing output."""
+
+    data: list[TimesReturnBase | ErrorTimesReturn]
+    meta: ApiMeta = Field(default=ApiMeta())
+
+
 def check_fields(return_dict: dict[str, str | list]) -> bool:
     """Check if zero or one values are not None."""
     removed_keys = ["removed", "oid"]
@@ -362,6 +420,37 @@ async def hours_batch(hours: list[HoursInput]) -> HoursListReturn:
 
     cleaned = [hours_process(each) for each in hours]
     return HoursListReturn(data=cleaned)
+
+
+def times_process(times: TimesInput) -> TimesReturnBase | ErrorTimesReturn:
+    """Help to format."""
+    try:
+        times_new = atlus.get_times(times.times)
+        return TimesReturnBase.model_validate({"times": times_new, "@id": times.oid})
+    except ValueError as e:
+        return times.make_error(_describe_hours_error(e))
+
+
+@router.post("/times/parse/", response_model_exclude_none=True, name="times parse")
+async def times_parse(times: TimesInput) -> TimesReturn:
+    """Format raw point-in-time strings (e.g. `collection_times`, `service_times`)
+    into the OSM format."""
+    return TimesReturn(data=times_process(times))
+
+
+@router.post("/times/batch/", response_model_exclude_none=True, name="times batch")
+async def times_batch(times: list[TimesInput]) -> TimesListReturn:
+    """Format raw point-in-time strings. Limit of 10,000 items per request."""
+    if len(times) > 10000:
+        raise HTTPException(
+            status_code=400,
+            detail="More than 10,000 items. Submit request in smaller batches.",
+        )
+    if len({i.oid for i in times}) != len(times):
+        raise HTTPException(status_code=400, detail="Ids [@id] are not unique.")
+
+    cleaned = [times_process(each) for each in times]
+    return TimesListReturn(data=cleaned)
 
 
 DESC = """

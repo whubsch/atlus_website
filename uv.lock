@@ -41,15 +41,15 @@ wheels = [
 
 [[package]]
 name = "atlus"
-version = "1.1.0b2"
+version = "1.1.0b3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "regex" },
     { name = "usaddress" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/40/1c/5ac582d82ee7ea31af139656d05fd9b4e20a5be984fc722867e09be88152/atlus-1.1.0b2.tar.gz", hash = "sha256:a2210e02af9bb1e691ddaef7d84de6936af33a10d3a7076c13aca275504d1a06", size = 67008, upload-time = "2026-07-27T23:55:26.651Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/26/800573e53489573c670a3674e91b1d3375b1b6408d15709f26d7bec82703/atlus-1.1.0b3.tar.gz", hash = "sha256:1d9862ee0255a5938cdf5e51c7ca8422100ca157894c2f623c247ed2b4d29447", size = 69999, upload-time = "2026-07-30T09:59:37.884Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/91/39e5959a97a3ac2aaa34737048a6082b2f6bc73e57b752a705f7eb8fabdf/atlus-1.1.0b2-py3-none-any.whl", hash = "sha256:f5acc68b0d78ccfe736091c490cd9f0d7da07cbe135ca50f9fa844ae94537d03", size = 21345, upload-time = "2026-07-27T23:55:25.63Z" },
+    { url = "https://files.pythonhosted.org/packages/45/5f/a9bb14e125c0bafbf2574e6ff146618bdc1f183aee691405445fea1b1e39/atlus-1.1.0b3-py3-none-any.whl", hash = "sha256:78d112068a1e5d9fe00e89b7b4bee4d780d4436618e15c070e32e44ff59c8e1f", size = 23329, upload-time = "2026-07-30T09:59:36.733Z" },
 ]
 
 [[package]]
@@ -67,7 +67,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlus", specifier = "==1.1.0b2" },
+    { name = "atlus", specifier = "==1.1.0b3" },
     { name = "fastapi", specifier = ">=0.112.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "pydantic", specifier = ">=2.8.2" },
@@ -93,7 +93,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlus", specifier = "==1.1.0b2" },
+    { name = "atlus", specifier = "==1.1.0b3" },
     { name = "fastapi", specifier = ">=0.112.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "httpx", specifier = ">=0.27.0" },
@@ -103,9 +103,6 @@ requires-dist = [
     { name = "regex", specifier = ">=2023.10.3" },
     { name = "uvicorn", specifier = ">=0.30.6" },
 ]
-
-[package.metadata.requires-dev]
-dev = []
 
 [[package]]
 name = "certifi"

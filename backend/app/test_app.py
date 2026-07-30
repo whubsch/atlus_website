@@ -45,6 +45,11 @@ test_hours = [
     "Weekdays 8am-6pm",
 ]
 
+test_times = [
+    "Mo-Fr 15:00,18:00,19:00,23:00; Sa 15:00; Su 10:30,23:00",
+    "Monday to Friday 3pm and 6pm",
+]
+
 
 def test_get_version() -> None:
     """Test version endpoint."""
@@ -124,3 +129,28 @@ def test_post_hours_parse_empty_string_error() -> None:
     assert response.status_code == 200
     data = response.json()["data"]
     assert data["error"] == "Empty opening hours string."
+
+
+@pytest.mark.parametrize("times", test_times)
+def test_post_times_parse(times: str) -> None:
+    """Test single times endpoint."""
+    response = client.post("/times/parse/", json={"times": times})
+    assert response.status_code == 200
+
+
+def test_post_times_batch() -> None:
+    """Test batch times endpoint."""
+    response = client.post(
+        "/times/batch/",
+        json=[{"times": each, "@id": oid} for oid, each in enumerate(test_times)],
+    )
+
+    assert response.status_code == 200
+
+
+def test_post_times_parse_empty_string_error() -> None:
+    """An empty times string should report why it failed."""
+    response = client.post("/times/parse/", json={"times": ""})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["error"] == "Empty collection/service times string."
