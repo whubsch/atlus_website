@@ -8,7 +8,7 @@ anyio==4.14.2
     # via
     #   httpx
     #   starlette
-atlus==1.1.0b3
+atlus==1.2.0
     # via backend
 certifi==2026.7.22
     # via
@@ -46,10 +46,9 @@ packaging==26.2
     #   pytest
 pluggy==1.6.0
     # via pytest
-probableparsing==0.0.1
-    # via usaddress
 pydantic==2.13.4
     # via
+    #   atlus
     #   backend
     #   fastapi
 pydantic-core==2.46.4
@@ -58,8 +57,6 @@ pygments==2.20.0
     # via pytest
 pytest==9.1.1
     # via backend
-python-crfsuite==0.9.12
-    # via usaddress
 regex==2026.7.19
     # via
     #   atlus
@@ -79,7 +76,5 @@ typing-inspection==0.4.2
     # via
     #   fastapi
     #   pydantic
-usaddress==0.5.16
-    # via atlus
 uvicorn==0.51.0
     # via backend

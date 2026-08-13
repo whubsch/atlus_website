@@ -80,11 +80,27 @@ def test_post_add_batch() -> None:
     assert response.status_code == 200
 
 
+def test_post_add_parse_error_preserves_id() -> None:
+    """An unparseable address should keep the caller-supplied @id, not default to 0."""
+    response = client.post("/address/parse/", json={"address": "asdkfj", "@id": 42})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["@id"] == 42
+
+
 @pytest.mark.parametrize("phone", test_phones)
 def test_post_phone_parse(phone: str) -> None:
     """Test single phone endpoint."""
     response = client.post("/phone/parse/", json={"phone": phone})
     assert response.status_code == 200
+
+
+def test_post_phone_parse_error_preserves_id() -> None:
+    """An unparseable phone should keep the caller-supplied @id, not default to 0."""
+    response = client.post("/phone/parse/", json={"phone": "not-a-phone", "@id": 42})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["@id"] == 42
 
 
 def test_post_phone_batch() -> None:
@@ -131,6 +147,26 @@ def test_post_hours_parse_empty_string_error() -> None:
     assert data["error"] == "Empty opening hours string."
 
 
+def test_post_hours_parse_error_preserves_id() -> None:
+    """An error result should keep the caller-supplied @id, not default to 0."""
+    response = client.post("/hours/parse/", json={"hours": "", "@id": 42})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["@id"] == 42
+
+
+def test_post_hours_batch_error_preserves_id() -> None:
+    """Errors within a batch should keep each item's own @id."""
+    response = client.post(
+        "/hours/batch/",
+        json=[{"hours": "", "@id": 7}, {"hours": test_hours[0], "@id": 8}],
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data[0]["@id"] == 7
+    assert data[1]["@id"] == 8
+
+
 @pytest.mark.parametrize("times", test_times)
 def test_post_times_parse(times: str) -> None:
     """Test single times endpoint."""
@@ -154,3 +190,23 @@ def test_post_times_parse_empty_string_error() -> None:
     assert response.status_code == 200
     data = response.json()["data"]
     assert data["error"] == "Empty collection/service times string."
+
+
+def test_post_times_parse_error_preserves_id() -> None:
+    """An error result should keep the caller-supplied @id, not default to 0."""
+    response = client.post("/times/parse/", json={"times": "", "@id": 42})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["@id"] == 42
+
+
+def test_post_times_batch_error_preserves_id() -> None:
+    """Errors within a batch should keep each item's own @id."""
+    response = client.post(
+        "/times/batch/",
+        json=[{"times": "", "@id": 7}, {"times": test_times[0], "@id": 8}],
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data[0]["@id"] == 7
+    assert data[1]["@id"] == 8

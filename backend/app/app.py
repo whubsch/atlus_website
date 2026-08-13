@@ -38,7 +38,7 @@ class AddressInput(BaseModel):
 
     def make_error(self):
         """Convert to error submodel."""
-        return ErrorAddressReturn(**self.model_dump())
+        return ErrorAddressReturn(**self.model_dump(by_alias=True))
 
 
 class ErrorAddressReturn(AddressInput):
@@ -129,7 +129,7 @@ class PhoneInput(BaseModel):
 
     def make_error(self):
         """Convert to error submodel."""
-        return ErrorPhoneReturn(**self.model_dump())
+        return ErrorPhoneReturn(**self.model_dump(by_alias=True))
 
 
 class ErrorPhoneReturn(PhoneInput):
@@ -187,8 +187,8 @@ class HoursInput(BaseModel):
     def make_error(self, message: str | None = None):
         """Convert to error submodel."""
         if message:
-            return ErrorHoursReturn(**self.model_dump(), error=message)
-        return ErrorHoursReturn(**self.model_dump())
+            return ErrorHoursReturn(**self.model_dump(by_alias=True), error=message)
+        return ErrorHoursReturn(**self.model_dump(by_alias=True))
 
 
 class ErrorHoursReturn(HoursInput):
@@ -245,8 +245,8 @@ class TimesInput(BaseModel):
     def make_error(self, message: str | None = None):
         """Convert to error submodel."""
         if message:
-            return ErrorTimesReturn(**self.model_dump(), error=message)
-        return ErrorTimesReturn(**self.model_dump())
+            return ErrorTimesReturn(**self.model_dump(by_alias=True), error=message)
+        return ErrorTimesReturn(**self.model_dump(by_alias=True))
 
 
 class ErrorTimesReturn(TimesInput):
