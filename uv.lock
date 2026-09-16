@@ -41,15 +41,15 @@ wheels = [
 
 [[package]]
 name = "atlus"
-version = "1.2.0"
+version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "regex" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/b7/67ba86b34b621a2cc11028a4691e0794220bade72fb51a7a766045225041/atlus-1.2.0.tar.gz", hash = "sha256:d5d42909a6039d2871a21f5a499090aa55493e46349040d8990b409beac89e3d", size = 83838, upload-time = "2026-08-13T10:25:27.785Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/ee/127b2b314a6d52f0ed581fc3f1b23bffc25f047f0bf0e60a75a9f17a7c8f/atlus-1.3.0.tar.gz", hash = "sha256:d7cb9885cef07787d95f86d28ee689644a0fb017ae958af5fa30351695525707", size = 89070, upload-time = "2026-09-16T10:23:02.681Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/28/52/73fd261ddeb1e355cf2254b87a3bf58b3a6cb069352cde6a14a6f7285afd/atlus-1.2.0-py3-none-any.whl", hash = "sha256:3d7b6ae5cb752bb035bcc0e4490704e164ef991300816d476d8262a70f72ebda", size = 31717, upload-time = "2026-08-13T10:25:26.704Z" },
+    { url = "https://files.pythonhosted.org/packages/54/39/3d67e82f3c808547d4157c12ec417b1eaed8e57fe3fb28d2abbc61315bc2/atlus-1.3.0-py3-none-any.whl", hash = "sha256:de3ab90e6ee09c4b23d13165a8063006c9caac280b8dc32a1ccacb9aacf3c842", size = 35124, upload-time = "2026-09-16T10:23:01.656Z" },
 ]
 
 [[package]]
@@ -67,7 +67,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlus", specifier = ">=1.2.0" },
+    { name = "atlus", specifier = "==1.3.0" },
     { name = "fastapi", specifier = ">=0.112.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "pydantic", specifier = ">=2.8.2" },
@@ -93,7 +93,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlus", specifier = ">=1.2.0" },
+    { name = "atlus", specifier = "==1.3.0" },
     { name = "fastapi", specifier = ">=0.112.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
     { name = "httpx", specifier = ">=0.27.0" },

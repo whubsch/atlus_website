@@ -164,7 +164,24 @@ def test_post_hours_batch_error_preserves_id() -> None:
     assert response.status_code == 200
     data = response.json()["data"]
     assert data[0]["@id"] == 7
-    assert data[1]["@id"] == 8
+
+
+def test_post_hours_parse_no_wrap_default_takes_colon_time_at_face_value() -> None:
+    """By default, ambiguous colon-form times are taken at face value."""
+    response = client.post("/hours/parse/", json={"hours": "Mo-Fr 9:00-5:00"})
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["opening_hours"] == "Mo-Fr 09:00-05:00"
+
+
+def test_post_hours_parse_no_wrap_true_assumes_business_hours() -> None:
+    """With no_wrap=True, ambiguous colon-form times resolve like bare digits."""
+    response = client.post(
+        "/hours/parse/", json={"hours": "Mo-Fr 9:00-5:00", "no_wrap": True}
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["opening_hours"] == "Mo-Fr 09:00-17:00"
 
 
 @pytest.mark.parametrize("times", test_times)

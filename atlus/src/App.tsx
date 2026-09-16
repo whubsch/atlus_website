@@ -14,6 +14,7 @@ import {
   Chip,
   Tooltip,
   Code,
+  Switch,
 } from "@heroui/react";
 
 import CopyAllIcon from "@mui/icons-material/CopyAll";
@@ -62,6 +63,7 @@ const App: React.FC<AppProps> = ({ dark }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string | number>("address");
   const [errorResp, setErrorResp] = useState<boolean>(false);
+  const [noWrap, setNoWrap] = useState<boolean>(false);
 
   const urlBase =
     import.meta.env.VITE_API_URL ||
@@ -96,7 +98,11 @@ const App: React.FC<AppProps> = ({ dark }) => {
           "Content-Type": "application/json",
           accept: "application/json",
         },
-        body: JSON.stringify({ [selectedTab]: inputValue }),
+        body: JSON.stringify(
+          selectedTab === "hours"
+            ? { hours: inputValue, no_wrap: noWrap }
+            : { [selectedTab]: inputValue },
+        ),
         mode: "cors",
       });
 
@@ -183,6 +189,30 @@ const App: React.FC<AppProps> = ({ dark }) => {
                       value={inputValue}
                       onChange={handleInputChange}
                     />
+                    <div className="flex items-center gap-1">
+                      <Switch
+                        size="sm"
+                        isSelected={noWrap}
+                        onValueChange={setNoWrap}
+                      >
+                        No wrap
+                      </Switch>
+                      <Tooltip
+                        content={
+                          <div className="max-w-64 py-1">
+                            Assume ambiguous times like &quot;9:00-5:00&quot; do
+                            not wrap around midnight (09:00-17:00), instead of
+                            taking them at face value as 24-hour time
+                            (09:00-05:00).
+                          </div>
+                        }
+                      >
+                        <InfoIcon
+                          fontSize="small"
+                          className="cursor-help opacity-60"
+                        />
+                      </Tooltip>
+                    </div>
                     <Button
                       color="primary"
                       size="sm"
@@ -230,14 +260,40 @@ const App: React.FC<AppProps> = ({ dark }) => {
               >
                 {/* small screen, button below */}
                 {selectedTab === "hours" ? (
-                  <Textarea
-                    size="md"
-                    label="Input"
-                    minRows={1}
-                    maxRows={5}
-                    value={inputValue}
-                    onChange={handleInputChange}
-                  />
+                  <div className="flex flex-col gap-2 w-full">
+                    <Textarea
+                      size="md"
+                      label="Input"
+                      minRows={1}
+                      maxRows={5}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                    />
+                    <div className="flex items-center gap-1">
+                      <Switch
+                        size="sm"
+                        isSelected={noWrap}
+                        onValueChange={setNoWrap}
+                      >
+                        No wrap
+                      </Switch>
+                      <Tooltip
+                        content={
+                          <div className="max-w-64 py-1">
+                            Assume ambiguous times like &quot;9:00-5:00&quot; do
+                            not wrap around midnight, <br />
+                            instead of taking them at face value as 24-hour time
+                            (09:00-05:00).
+                          </div>
+                        }
+                      >
+                        <InfoIcon
+                          fontSize="small"
+                          className="cursor-help opacity-60"
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
                 ) : (
                   <Input
                     type="text"

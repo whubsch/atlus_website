@@ -178,6 +178,17 @@ class HoursInput(BaseModel):
             "Closed",
         ],
     )
+    no_wrap: bool = Field(
+        default=False,
+        description=(
+            "If True, ambiguous colon-form times with no am/pm marker "
+            "(e.g. the '5:00' in '9:00-5:00') are resolved the same way "
+            "bare digits are: assumed to be typical AM-to-PM business "
+            "hours. By default, such colon-form times are instead taken "
+            "at face value as 24-hour time (e.g. '9:00-5:00' becomes "
+            "'09:00-05:00' rather than '09:00-17:00')."
+        ),
+    )
     oid: int | str = Field(
         alias="@id",
         description="Unique identifier to help match with outputs.",
@@ -393,7 +404,7 @@ def _describe_hours_error(exc: ValueError) -> str:
 def hours_process(hours: HoursInput) -> HoursReturnBase | ErrorHoursReturn:
     """Help to format."""
     try:
-        hours_new = atlus.get_hours(hours.hours)
+        hours_new = atlus.get_hours(hours.hours, no_wrap=hours.no_wrap)
         return HoursReturnBase.model_validate(
             {"opening_hours": hours_new, "@id": hours.oid}
         )
